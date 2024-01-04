@@ -168,6 +168,7 @@ mod tests {
         assert_eq!(url, "https://api.binance.com/api/v3/depth")
     }
 
+    #[cfg(not(tarpaulin_include))]
     #[tokio::test]
     async fn get_orderbook_pass() {
         env::set_var("BINANCE_API_KEY", "Bearer Key");
@@ -191,6 +192,7 @@ mod tests {
         );
     }
 
+    #[cfg(not(tarpaulin_include))]
     #[tokio::test]
     async fn get_orderbook_fail() {
         env::set_var("BINANCE_API_KEY", "Bearer Key");
