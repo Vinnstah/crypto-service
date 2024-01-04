@@ -2,14 +2,16 @@
 A Crypto REST API-backend written in Rust with Axum. 
 
 # TODO
-- [] Endpoints
+- [WIP] Endpoints
 - [] Binance requests
-    - [] GET Orderbook
+    - [WIP] GET Orderbook
+        -[WIP] Tests
     - [] GET Recent Trades
     - [] Set up websocket
     - [] POST mock trade
 - [] Authentication Middleware
-- [] CodeCov
+- [x] Add CodeCov
 - [] Tests
 - [] CI/CD
+    - [x] Add GitHub Actions
 - [] Open API specs
