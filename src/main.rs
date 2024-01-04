@@ -1,6 +1,6 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
-use crypto_service::binance_service::orderbook_handler::{self, BinanceClient};
+use crypto_service::binance_service::{orderbook_handler::{self}, binance_client::BinanceClient};
 
 #[tokio::main]
 async fn main() -> Result<()> {
