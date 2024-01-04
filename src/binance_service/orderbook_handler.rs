@@ -25,7 +25,7 @@ impl OrderBookResponse {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookRequest {
     symbol: String,
     limit: Option<u16>,
@@ -74,6 +74,8 @@ pub async fn get_order_book(
 
 #[cfg(test)]
 mod tests {
+    use crate::binance_service::binance_client;
+
     use super::*;
 
     #[test]
@@ -131,4 +133,37 @@ mod tests {
             orderbook_response_json
         )
     }
+
+    #[test]
+    fn orderbook_payload_and_params() {
+        let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
+
+        let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
+        assert_eq!(payload, OrderBookRequest { symbol: "ETHBTC".to_string(), limit: Some(1) });
+        
+        let symbol_param = [("symbol", payload.symbol)];
+        assert_eq!(symbol_param, [("symbol", "ETHBTC".to_string())]);
+
+        let mut limit_param: Vec<(&str, u16)> = vec![];
+        if let Some(limit) = payload.limit {
+            limit_param.push(("limit", limit));
+        }
+        assert_eq!(limit_param, vec![("limit", 1)])
+    }
+
+    #[test]
+    fn binance_client_and_url() {
+        env::set_var("BINANCE_API_KEY", "Bearer Key");
+        
+        let binance_client = BinanceClient::new();
+        let mut url = binance_client.base_url.clone();
+        url.push_str("depth");
+
+        assert_eq!(url, "https://api.binance.com/api/v3/depth")
+    }
+
 }
+
+
+// let mut url = binance_client.base_url.clone();
+// url.push_str("depth");
