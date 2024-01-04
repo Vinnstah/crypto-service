@@ -1,5 +1,5 @@
+use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use std::env;
-use reqwest::header::{CONTENT_TYPE, HeaderMap};
 
 #[derive(Clone, Debug)]
 pub struct BinanceClient {
