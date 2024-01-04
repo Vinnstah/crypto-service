@@ -1,12 +1,13 @@
 # Crypto Service
 [![codecov](https://codecov.io/gh/Vinnstah/crypto-service/graph/badge.svg?token=YZ6OR1BZXJ)](https://codecov.io/gh/Vinnstah/crypto-service)
+
 A Crypto REST API-backend written in Rust with Axum. 
 
 # TODO
 - [ ] Endpoints
-- [WIP] Binance requests
-    - [WIP] GET Orderbook
-        - [WIP] Tests
+- [ ] Binance requests
+    - [ ] GET Orderbook
+        - [ ] Tests
     - [ ] GET Recent Trades
     - [ ] Set up websocket
     - [ ] POST mock trade

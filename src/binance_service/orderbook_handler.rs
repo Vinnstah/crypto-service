@@ -2,7 +2,7 @@ use axum::extract;
 use axum::http::StatusCode;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
-use std::{env, vec};
+use std::{env, ops::Not, vec};
 
 use crate::binance_service::binance_client::BinanceClient;
 
@@ -22,6 +22,14 @@ impl OrderBookResponse {
             bids,
             last_update_id,
         }
+    }
+}
+
+impl Not for OrderBookResponse {
+    type Output = OrderBookResponse;
+
+    fn not(self) -> Self::Output {
+        todo!()
     }
 }
 
@@ -58,13 +66,10 @@ pub async fn get_order_book(
 
     match response.status() {
         reqwest::StatusCode::OK => match response.json::<OrderBookResponse>().await {
-            Ok(order_book) => {
-                println!("OK");
-                Ok((StatusCode::OK, axum::Json(order_book)))
-            }
+            Ok(order_book) => Ok((StatusCode::OK, axum::Json(order_book))),
             Err(err) => {
                 println!("{}", err);
-                Err(StatusCode::BAD_GATEWAY)
+                Err(StatusCode::INTERNAL_SERVER_ERROR)
             }
         },
         _other => Err(StatusCode::from_u16(response.status().as_u16())
@@ -74,8 +79,6 @@ pub async fn get_order_book(
 
 #[cfg(test)]
 mod tests {
-    use crate::binance_service::binance_client;
-
     use super::*;
 
     #[test]
@@ -126,12 +129,9 @@ mod tests {
 
         let orderbook_response_json = r#"{"asks":[["0.05161000","32.45550000"]],"bids":[["0.05160000","133.57940000"]],"lastUpdateId":7010139557}"#;
 
-        let serialized_orderbook_response = serde_json::to_string(&orderbook_response);
+        let serialized_orderbook_response = serde_json::to_string(&orderbook_response).unwrap();
 
-        assert_eq!(
-            serialized_orderbook_response.unwrap(),
-            orderbook_response_json
-        )
+        assert_eq!(serialized_orderbook_response, orderbook_response_json)
     }
 
     #[test]
@@ -139,8 +139,14 @@ mod tests {
         let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
 
         let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
-        assert_eq!(payload, OrderBookRequest { symbol: "ETHBTC".to_string(), limit: Some(1) });
-        
+        assert_eq!(
+            payload,
+            OrderBookRequest {
+                symbol: "ETHBTC".to_string(),
+                limit: Some(1)
+            }
+        );
+
         let symbol_param = [("symbol", payload.symbol)];
         assert_eq!(symbol_param, [("symbol", "ETHBTC".to_string())]);
 
@@ -154,7 +160,7 @@ mod tests {
     #[test]
     fn binance_client_and_url() {
         env::set_var("BINANCE_API_KEY", "Bearer Key");
-        
+
         let binance_client = BinanceClient::new();
         let mut url = binance_client.base_url.clone();
         url.push_str("depth");
@@ -162,8 +168,40 @@ mod tests {
         assert_eq!(url, "https://api.binance.com/api/v3/depth")
     }
 
+    #[tokio::test]
+    async fn get_orderbook_pass() {
+        env::set_var("BINANCE_API_KEY", "Bearer Key");
+        let binance_client = BinanceClient::new();
+
+        let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
+        let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
+
+        let result = get_order_book(axum::extract::State(binance_client), axum::Json(payload))
+            .await
+            .unwrap();
+
+        assert_eq!(result.0, StatusCode::OK);
+        assert_eq!(
+            result.1 .0,
+            OrderBookResponse::new(
+                vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
+                vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
+                7010139557,
+            )
+        );
+    }
+
+    #[tokio::test]
+    async fn get_orderbook_fail() {
+        env::set_var("BINANCE_API_KEY", "Bearer Key");
+        let binance_client = BinanceClient::new();
+
+        let orderbook_request = r#"{"symbol": "APA", "limit": 1}"#;
+        let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
+
+        let result =
+            get_order_book(axum::extract::State(binance_client), axum::Json(payload)).await;
+
+        assert_eq!(result.err(), Some(StatusCode::BAD_REQUEST));
+    }
 }
-
-
-// let mut url = binance_client.base_url.clone();
-// url.push_str("depth");

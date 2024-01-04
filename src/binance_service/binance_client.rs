@@ -1,7 +1,7 @@
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use std::env;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct BinanceClient {
     pub headers: HeaderMap,
     pub base_url: String,
@@ -36,5 +36,19 @@ impl BinanceClient {
 impl Default for BinanceClient {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn default_client() {
+        env::set_var("BINANCE_API_KEY", "Bearer Key");
+
+        let default_client = BinanceClient::default();
+        assert_eq!(default_client, BinanceClient::new())
     }
 }
