@@ -2,7 +2,7 @@ use axum::extract;
 use axum::http::StatusCode;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
-use std::{env, ops::Not, vec};
+use std::{env, vec};
 
 use crate::binance_service::binance_client::BinanceClient;
 
@@ -25,14 +25,6 @@ impl OrderBookResponse {
     }
 }
 
-impl Not for OrderBookResponse {
-    type Output = OrderBookResponse;
-
-    fn not(self) -> Self::Output {
-        todo!()
-    }
-}
-
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookRequest {
     symbol: String,
@@ -43,7 +35,10 @@ pub struct OrderBookRequest {
 pub async fn get_order_book(
     extract::State(binance_client): extract::State<BinanceClient>,
     axum::Json(payload): axum::Json<OrderBookRequest>,
-) -> Result<(axum::http::StatusCode, axum::Json<OrderBookResponse>), axum::http::StatusCode> {
+) -> Result<
+    (axum::http::StatusCode, axum::Json<OrderBookResponse>),
+    (axum::http::StatusCode, axum::Json<String>),
+> {
     let client = reqwest::Client::new();
 
     let symbol_param = [("symbol", payload.symbol)];
@@ -69,11 +64,16 @@ pub async fn get_order_book(
             Ok(order_book) => Ok((StatusCode::OK, axum::Json(order_book))),
             Err(err) => {
                 println!("{}", err);
-                Err(StatusCode::INTERNAL_SERVER_ERROR)
+                Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    axum::Json(err.to_string()),
+                ))
             }
         },
-        _other => Err(StatusCode::from_u16(response.status().as_u16())
-            .unwrap_or(StatusCode::UNPROCESSABLE_ENTITY)),
+        _other => Err((
+            StatusCode::from_u16(response.status().as_u16()).unwrap(),
+            axum::Json(response.text().await.unwrap()),
+        )),
     }
 }
 
@@ -138,7 +138,8 @@ mod tests {
     fn orderbook_payload_and_params() {
         let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
 
-        let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
+        let payload: OrderBookRequest =
+            serde_json::from_str(orderbook_request).expect("Failed to deserialize request");
         assert_eq!(
             payload,
             OrderBookRequest {
@@ -183,7 +184,7 @@ mod tests {
 
         assert_eq!(result.0, StatusCode::OK);
         assert_ne!(
-            result.1.0,
+            result.1 .0,
             OrderBookResponse::new(
                 vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
                 vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
@@ -194,7 +195,7 @@ mod tests {
 
     #[tokio::test]
     #[cfg(not(tarpaulin))]
-    async fn get_orderbook_fail() {
+    async fn get_orderbook_fail_invalid_symbol() {
         env::set_var("BINANCE_API_KEY", "Bearer Key");
         let binance_client = BinanceClient::new();
 
@@ -204,6 +205,6 @@ mod tests {
         let result =
             get_order_book(axum::extract::State(binance_client), axum::Json(payload)).await;
 
-        assert_eq!(result.err(), Some(StatusCode::BAD_REQUEST));
+        assert_eq!(result.err().unwrap().0, StatusCode::BAD_REQUEST)
     }
 }

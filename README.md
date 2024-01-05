@@ -6,7 +6,7 @@ A Crypto REST API-backend written in Rust with Axum.
 # TODO
 - [ ] Endpoints
 - [ ] Binance requests
-    - [ ] GET Orderbook
+    - [x] GET Orderbook
         - [ ] Tests
     - [ ] GET Recent Trades
     - [ ] Set up websocket
