@@ -1,10 +1,6 @@
-use axum::extract;
-use axum::http::StatusCode;
-use reqwest::{self};
-use serde::{Deserialize, Serialize};
-use std::{env, vec};
-
 use crate::binance_service::binance_client::BinanceClient;
+use axum::extract;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookResponse {
@@ -27,8 +23,8 @@ impl OrderBookResponse {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookRequest {
-    symbol: String,
-    limit: Option<u16>,
+    pub symbol: String,
+    pub limit: Option<u16>,
 }
 
 #[axum::debug_handler]
@@ -39,47 +35,14 @@ pub async fn get_order_book(
     (axum::http::StatusCode, axum::Json<OrderBookResponse>),
     (axum::http::StatusCode, axum::Json<String>),
 > {
-    let client = reqwest::Client::new();
-
-    let symbol_param = [("symbol", payload.symbol)];
-    let mut limit_param: Vec<(&str, u16)> = vec![];
-    if let Some(limit) = payload.limit {
-        limit_param.push(("limit", limit));
-    }
-
-    let mut url = binance_client.base_url.clone();
-    url.push_str("depth");
-
-    let response = client
-        .get(url)
-        .headers(binance_client.headers.clone())
-        .query(&symbol_param)
-        .query(&limit_param)
-        .send()
-        .await
-        .unwrap();
-
-    match response.status() {
-        reqwest::StatusCode::OK => match response.json::<OrderBookResponse>().await {
-            Ok(order_book) => Ok((StatusCode::OK, axum::Json(order_book))),
-            Err(err) => {
-                println!("{}", err);
-                Err((
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    axum::Json(err.to_string()),
-                ))
-            }
-        },
-        _other => Err((
-            StatusCode::from_u16(response.status().as_u16()).unwrap(),
-            axum::Json(response.text().await.unwrap()),
-        )),
-    }
+    BinanceClient::get_order_book(binance_client, payload, "depth").await
 }
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use axum::http::StatusCode;
 
     #[test]
     fn new_orderbook_response() {
@@ -160,7 +123,7 @@ mod tests {
 
     #[test]
     fn binance_client_and_url() {
-        env::set_var("BINANCE_API_KEY", "Bearer Key");
+        std::env::set_var("BINANCE_API_KEY", "Bearer Key");
 
         let binance_client = BinanceClient::new();
         let mut url = binance_client.base_url.clone();
@@ -172,7 +135,7 @@ mod tests {
     #[tokio::test]
     #[cfg(not(tarpaulin))]
     async fn get_orderbook_pass() {
-        env::set_var("BINANCE_API_KEY", "Bearer Key");
+        std::env::set_var("BINANCE_API_KEY", "Bearer Key");
         let binance_client = BinanceClient::new();
 
         let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
@@ -196,7 +159,7 @@ mod tests {
     #[tokio::test]
     #[cfg(not(tarpaulin))]
     async fn get_orderbook_fail_invalid_symbol() {
-        env::set_var("BINANCE_API_KEY", "Bearer Key");
+        std::env::set_var("BINANCE_API_KEY", "Bearer Key");
         let binance_client = BinanceClient::new();
 
         let orderbook_request = r#"{"symbol": "APA", "limit": 1}"#;
