@@ -8,7 +8,7 @@ A Crypto REST API-backend written in Rust with Axum.
 - [ ] Binance requests
     - [x] GET Orderbook
         - [ ] Tests
-    - [ ] GET Recent Trades
+    - [x] GET Recent Trades
     - [ ] Set up websocket
     - [ ] POST mock trade
 - [ ] Authentication Middleware
