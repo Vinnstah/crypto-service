@@ -167,7 +167,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(not(tarpaulin))]
     async fn get_orderbook_pass() {
         std::env::set_var("BINANCE_API_KEY", "Bearer Key");
         std::env::set_var("COINAPI_API_KEY", "Bearer Key");
@@ -199,7 +198,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(not(tarpaulin))]
     async fn get_orderbook_fail_invalid_symbol() {
         std::env::set_var("BINANCE_API_KEY", "Bearer Key");
         std::env::set_var("COINAPI_API_KEY", "Bearer Key");
