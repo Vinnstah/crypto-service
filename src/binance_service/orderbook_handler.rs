@@ -1,16 +1,13 @@
-use std::collections::{hash_map, HashMap};
+use std::collections::HashMap;
 
 use crate::{
-    api_client::{
-        api_client::ApiClient,
-        get::{self, QueryItems},
-    },
+    api_client::{api_client::ApiClient, get::QueryItems},
     binance_service::binance_client::BinanceClient,
     state::AppState,
 };
 use axum::extract;
 use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
+use serde_json::Value;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookResponse {
@@ -70,20 +67,12 @@ pub async fn get_order_book(
     (axum::http::StatusCode, axum::Json<OrderBookResponse>),
     (axum::http::StatusCode, axum::Json<String>),
 > {
-    let response = ApiClient::<BinanceClient>::get::<OrderBookRequest, OrderBookResponse>(
+    ApiClient::<BinanceClient>::get::<OrderBookRequest, OrderBookResponse>(
         state.binance_client,
         "depth",
         payload,
     )
-    .await;
-
-    match response {
-        Ok(body) => Ok((
-            body.0,
-            axum::Json(body.1.json::<OrderBookResponse>().await.unwrap()),
-        )),
-        Err(status) => Err((status, axum::Json(status.to_string()))),
-    }
+    .await
 }
 
 #[axum::debug_handler]
@@ -97,20 +86,12 @@ pub async fn get_recent_trades(
     ),
     (axum::http::StatusCode, axum::Json<String>),
 > {
-    let response = ApiClient::<BinanceClient>::get::<OrderBookRequest, RecentTradesResponse>(
+    ApiClient::<BinanceClient>::get::<OrderBookRequest, Vec<RecentTradesResponse>>(
         state.binance_client,
         "trades",
         payload,
     )
-    .await;
-
-    match response {
-        Ok(body) => Ok((
-            body.0,
-            axum::Json(body.1.json::<Vec<RecentTradesResponse>>().await.unwrap()),
-        )),
-        Err(status) => Err((status, axum::Json(status.to_string()))),
-    }
+    .await
 }
 
 impl QueryItems for OrderBookRequest {
