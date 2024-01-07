@@ -35,7 +35,6 @@ impl CoinApiClient {
     }
 
     async fn get<Request, Response>(
-        // async fn get<Request: CoinAPIQueryItems, Response: CoinAPIResponse<Response = reqwest::Response>>(
         &self,
         path: &str,
         payload: Request,
@@ -56,8 +55,7 @@ impl CoinApiClient {
             .send()
             .await
             .unwrap();
-        println!("{:#?}", response);
-        println!("{:#?}", payload);
+
         match response.status() {
             reqwest::StatusCode::OK => Ok((StatusCode::OK, response)),
             _other => Err(StatusCode::INTERNAL_SERVER_ERROR),

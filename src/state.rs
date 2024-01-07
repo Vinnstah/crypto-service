@@ -1,5 +1,5 @@
 use crate::{
-    binance_service::binance_client::BinanceClient, coinapi_service::coinapi_client::CoinApiClient,
+    binance_service::binance_client::BinanceClient, coinapi_service::coinapi_client::CoinApiClient, api_client::api_client::ApiClient,
 };
 
 #[derive(Debug, Clone)]

@@ -6,7 +6,7 @@ use crypto_service::{
         orderbook_handler::{self},
     },
     coinapi_service::{self, coinapi_client::CoinApiClient},
-    state::AppState,
+    state::AppState, api_client::api_client::ApiClient,
 };
 
 // pub struct AppState {
@@ -18,6 +18,8 @@ use crypto_service::{
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
 
+    // let binance_client = ApiClient::new(BinanceClient::new());
+    // let coinapi_client = ApiClient::new(CoinApiClient::new());
     let binance_client: BinanceClient = BinanceClient::new();
     let coinapi_client: CoinApiClient = CoinApiClient::new();
     let state = AppState {
@@ -26,7 +28,7 @@ async fn main() -> Result<()> {
     };
 
     let app = Router::new()
-        .route("/v1/orderbook", get(orderbook_handler::get_order_book))
+        // .route("/v1/orderbook", get(orderbook_handler::get_order_book))
         .route("/v1/trades", get(orderbook_handler::get_recent_trades))
         .route(
             "/v1/assets",
