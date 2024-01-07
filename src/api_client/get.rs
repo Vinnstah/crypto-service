@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
+use super::api_client::{ApiClient, Client};
 use axum::http::StatusCode;
 use serde::Serialize;
-use super::api_client::{ApiClient, Client};
 
 impl<T: Client> ApiClient<T> {
     pub async fn get<Request, Response>(
@@ -18,7 +18,7 @@ impl<T: Client> ApiClient<T> {
         url.push_str(path);
 
         let client = reqwest::Client::new();
-        println!("{:#?}", payload);
+        
         let response = client
             .get(url)
             .headers(client_source.get_headers())
@@ -38,4 +38,3 @@ pub trait QueryItems {
     type Query;
     fn get_all_queries(&self) -> HashMap<&str, Self::Query>;
 }
-

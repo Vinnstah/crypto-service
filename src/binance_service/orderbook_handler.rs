@@ -1,9 +1,16 @@
 use std::collections::{hash_map, HashMap};
 
+use crate::{
+    api_client::{
+        api_client::ApiClient,
+        get::{self, QueryItems},
+    },
+    binance_service::binance_client::BinanceClient,
+    state::AppState,
+};
 use axum::extract;
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, Number};
-use crate::{binance_service::binance_client::BinanceClient, state::AppState, api_client::{get::{self, QueryItems}, api_client::ApiClient}};
+use serde_json::{Number, Value};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookResponse {
@@ -33,7 +40,7 @@ pub struct OrderBookRequest {
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 pub enum OrderBookRequestTypes {
     Symbol(String),
-    Limit(Option<u16>)
+    Limit(Option<u16>),
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
@@ -55,16 +62,29 @@ pub struct RecentTradesResponse {
     is_best_match: bool,
 }
 
-// #[axum::debug_handler]
-// pub async fn get_order_book(
-//     extract::State(state): extract::State<AppState>,
-//     axum::Json(payload): axum::Json<OrderBookRequest>,
-// ) -> Result<
-//     (axum::http::StatusCode, axum::Json<OrderBookResponse>),
-//     (axum::http::StatusCode, axum::Json<String>),
-// > {
-//     BinanceClient::get_order_book(state.binance_client, payload, "depth").await
-// }
+#[axum::debug_handler]
+pub async fn get_order_book(
+    extract::State(state): extract::State<AppState>,
+    axum::Json(payload): axum::Json<OrderBookRequest>,
+) -> Result<
+    (axum::http::StatusCode, axum::Json<OrderBookResponse>),
+    (axum::http::StatusCode, axum::Json<String>),
+> {
+    let response = ApiClient::<BinanceClient>::get::<OrderBookRequest, OrderBookResponse>(
+        state.binance_client,
+        "depth",
+        payload,
+    )
+    .await;
+
+    match response {
+        Ok(body) => Ok((
+            body.0,
+            axum::Json(body.1.json::<OrderBookResponse>().await.unwrap()),
+        )),
+        Err(status) => Err((status, axum::Json(status.to_string()))),
+    }
+}
 
 #[axum::debug_handler]
 pub async fn get_recent_trades(
@@ -77,20 +97,21 @@ pub async fn get_recent_trades(
     ),
     (axum::http::StatusCode, axum::Json<String>),
 > {
-    println!("{:#?}", payload);
-    let response = ApiClient::<BinanceClient>::get::<OrderBookRequest, RecentTradesResponse>(state.binance_client, "trades", payload).await;
-    
-    match response {
-        Ok(body) => {
-        Ok((body.0, axum::gsJson(body.1.json::<Vec<RecentTradesResponse>>().await.unwrap())))
-    } ,
-    Err(status) => Err((status, axum::Json(status.to_string()))),
-}
+    let response = ApiClient::<BinanceClient>::get::<OrderBookRequest, RecentTradesResponse>(
+        state.binance_client,
+        "trades",
+        payload,
+    )
+    .await;
 
+    match response {
+        Ok(body) => Ok((
+            body.0,
+            axum::Json(body.1.json::<Vec<RecentTradesResponse>>().await.unwrap()),
+        )),
+        Err(status) => Err((status, axum::Json(status.to_string()))),
     }
-    // ApiClient::get(state.binance_client, path, payload);
-    // ApiClient::<BinanceClient>::get(state.binance_client.to_owned() , "trades", payload);
-    // BinanceClient::get_order_book(state.binance_client, payload, "trades").await
+}
 
 impl QueryItems for OrderBookRequest {
     type Query = Value;
@@ -100,13 +121,12 @@ impl QueryItems for OrderBookRequest {
         if Value::is_string(&self.symbol) {
             hash_map.insert("symbol", self.symbol.clone());
         }
-        
+
         match &self.limit {
-            Value::Number(limit) => hash_map.insert("limit", serde_json::Value::Number(limit.clone())),
-            _other => panic!("Failed")
-            // OrderBookRequestTypes::Symbol(_) => None,
-            // OrderBookRequestTypes::Limit(limit) => 
-            // Some(hash_map.insert("limit", OrderBookRequestTypes::Limit(limit))  )
+            Value::Number(limit) => {
+                hash_map.insert("limit", serde_json::Value::Number(limit.clone()))
+            }
+            _other => panic!("Failed"),
         };
         hash_map
     }
@@ -184,79 +204,79 @@ mod tests {
     //             limit: Some(1)
     //         }
     //     );
-        
+
     //     let symbol_param = [("symbol", payload.symbol)];
     //     assert_eq!(symbol_param, [("symbol", "ETHBTC".to_string())]);
-        
+
     //     let mut limit_param: Vec<(&str, u16)> = vec![];
     //     if let Some(limit) = payload.limit {
     //         limit_param.push(("limit", limit));
     //     }
     //     assert_eq!(limit_param, vec![("limit", 1)])
     // }
-    
+
     #[test]
     fn binance_client_and_url() {
         std::env::set_var("BINANCE_API_KEY", "Bearer Key");
-        
+
         let binance_client = BinanceClient::new();
         let mut url = binance_client.base_url.clone();
         url.push_str("depth");
-        
+
         assert_eq!(url, "https://api.binance.com/api/v3/depth")
     }
-    
-//     #[tokio::test]
-//     async fn get_orderbook_pass() {
-//         std::env::set_var("BINANCE_API_KEY", "Bearer Key");
-//         std::env::set_var("COINAPI_API_KEY", "Bearer Key");
-        
-//         let mut binance_client = BinanceClient::new();
-//         let coinapi_client = CoinApiClient::new();
 
-//         binance_client.base_url = "https://api.binance.us/api/v1/".to_string();
-//         let state = AppState {
-//             binance_client,
-//             coinapi_client,
-//         };
-        
-//         let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
-//         let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
-        
-//         let result: (axum::http::StatusCode, axum::Json<OrderBookResponse>) =
-//         get_order_book(axum::extract::State(state), axum::Json(payload))
-//         .await
-//         .unwrap();
-    
-//     assert_eq!(result.0, StatusCode::OK);
-//     assert_ne!(
-//         result.1 .0,
-//         OrderBookResponse::new(
-//             vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
-//             vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
-//             7010139557,
-//         )
-//     );
-// }
+    //     #[tokio::test]
+    //     async fn get_orderbook_pass() {
+    //         std::env::set_var("BINANCE_API_KEY", "Bearer Key");
+    //         std::env::set_var("COINAPI_API_KEY", "Bearer Key");
 
-// #[tokio::test]
-// async fn get_orderbook_fail_invalid_symbol() {
-//     std::env::set_var("BINANCE_API_KEY", "Bearer Key");
-//     std::env::set_var("COINAPI_API_KEY", "Bearer Key");
-    
-//     let mut binance_client = BinanceClient::new();
-//     let coinapi_client = CoinApiClient::new();
-//     binance_client.base_url = "https://api.binance.us/api/v1/".to_string();
-//     let state = AppState {
-//         binance_client,
-//         coinapi_client,
-//         };
+    //         let mut binance_client = BinanceClient::new();
+    //         let coinapi_client = CoinApiClient::new();
 
-//         let orderbook_request = r#"{"symbol": "APA", "limit": 1}"#;
-//         let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
+    //         binance_client.base_url = "https://api.binance.us/api/v1/".to_string();
+    //         let state = AppState {
+    //             binance_client,
+    //             coinapi_client,
+    //         };
 
-//         let result = get_order_book(axum::extract::State(state), axum::Json(payload)).await;
+    //         let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
+    //         let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
 
-//         assert_eq!(result.err().unwrap().0, StatusCode::BAD_REQUEST)
-//     }
+    //         let result: (axum::http::StatusCode, axum::Json<OrderBookResponse>) =
+    //         get_order_book(axum::extract::State(state), axum::Json(payload))
+    //         .await
+    //         .unwrap();
+
+    //     assert_eq!(result.0, StatusCode::OK);
+    //     assert_ne!(
+    //         result.1 .0,
+    //         OrderBookResponse::new(
+    //             vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
+    //             vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
+    //             7010139557,
+    //         )
+    //     );
+    // }
+
+    // #[tokio::test]
+    // async fn get_orderbook_fail_invalid_symbol() {
+    //     std::env::set_var("BINANCE_API_KEY", "Bearer Key");
+    //     std::env::set_var("COINAPI_API_KEY", "Bearer Key");
+
+    //     let mut binance_client = BinanceClient::new();
+    //     let coinapi_client = CoinApiClient::new();
+    //     binance_client.base_url = "https://api.binance.us/api/v1/".to_string();
+    //     let state = AppState {
+    //         binance_client,
+    //         coinapi_client,
+    //         };
+
+    //         let orderbook_request = r#"{"symbol": "APA", "limit": 1}"#;
+    //         let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
+
+    //         let result = get_order_book(axum::extract::State(state), axum::Json(payload)).await;
+
+    //         assert_eq!(result.err().unwrap().0, StatusCode::BAD_REQUEST)
+    //     }
 }

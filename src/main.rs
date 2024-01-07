@@ -1,12 +1,13 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
 use crypto_service::{
+    api_client::api_client::ApiClient,
     binance_service::{
         binance_client::BinanceClient,
         orderbook_handler::{self},
     },
     coinapi_service::{self, coinapi_client::CoinApiClient},
-    state::AppState, api_client::api_client::ApiClient,
+    state::AppState,
 };
 
 // pub struct AppState {
@@ -28,7 +29,7 @@ async fn main() -> Result<()> {
     };
 
     let app = Router::new()
-        // .route("/v1/orderbook", get(orderbook_handler::get_order_book))
+        .route("/v1/orderbook", get(orderbook_handler::get_order_book))
         .route("/v1/trades", get(orderbook_handler::get_recent_trades))
         .route(
             "/v1/assets",
