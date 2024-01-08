@@ -10,16 +10,15 @@ use crypto_service::{
     state::AppState,
 };
 
-
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
 
     let binance_client: BinanceClient = BinanceClient::new();
     let coinapi_client: CoinApiClient = CoinApiClient::new();
-    let http_client = reqwest::Client::new();
+    let api_client = ApiClient::new();
 
-    let state = AppState::new(binance_client, coinapi_client, http_client);
+    let state = AppState::new(binance_client, coinapi_client, api_client);
 
     let app = Router::new()
         .route("/v1/orderbook", get(orderbook_handler::get_order_book))

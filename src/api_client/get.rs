@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
-use super::api_client::{ApiClient, Client};
+use super::{api_client::ApiClient, client_trait::Client};
 use axum::http::StatusCode;
 use serde::{de::DeserializeOwned, Serialize};
 
-impl<T: Client> ApiClient<T> {
-    pub async fn get<Request, Response>(
+impl ApiClient {
+    pub async fn get<Request, Response, T: Client>(
+        &self,
         client_source: T,
         path: &str,
         payload: Request,
@@ -18,9 +19,8 @@ impl<T: Client> ApiClient<T> {
         let mut url = client_source.get_base_url();
         url.push_str(path);
 
-        let client = reqwest::Client::new();
-
-        let response = client
+        let response = self
+            .http_client
             .get(url)
             .headers(client_source.get_headers())
             .query(&payload.get_all_queries())
@@ -29,11 +29,6 @@ impl<T: Client> ApiClient<T> {
             .unwrap()
             .json::<Response>()
             .await;
-
-        // match response. .status() {
-        //     reqwest::StatusCode::OK => Ok((StatusCode::OK, axum::Json::<Response>(response) )),
-        //     _other => Err(StatusCode::INTERNAL_SERVER_ERROR),
-        // }
 
         match response {
             Ok(json) => Ok((StatusCode::OK, axum::Json::<Response>(json))),

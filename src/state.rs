@@ -7,9 +7,19 @@ use crate::{
 pub struct AppState {
     pub binance_client: BinanceClient,
     pub coinapi_client: CoinApiClient,
-    pub http_client: reqwest::Client
+    pub api_client: ApiClient,
 }
 
 impl AppState {
-    pub fn new(binance_client: BinanceClient, coinapi_client: CoinApiClient, http_client: reqwest::Client) -> Self { Self { binance_client, coinapi_client, http_client } }
+    pub fn new(
+        binance_client: BinanceClient,
+        coinapi_client: CoinApiClient,
+        api_client: ApiClient,
+    ) -> Self {
+        Self {
+            binance_client,
+            coinapi_client,
+            api_client,
+        }
+    }
 }
