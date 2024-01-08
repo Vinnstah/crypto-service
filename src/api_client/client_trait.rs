@@ -105,4 +105,33 @@ mod tests {
             "TEST"
         )
     }
+
+    #[test]
+    fn get_base_url_coinapi_client() {
+        std::env::set_var("COINAPI_API_KEY", "TEST");
+
+        let binance_client = CoinApiClient::new();
+        assert_eq!(
+            binance_client.get_base_url(),
+            String::from_str("https://rest.coinapi.io/v1/").unwrap()
+        )
+    }
+
+    #[test]
+    fn get_headers_coinapi_client() {
+        std::env::set_var("COINAPI_API_KEY", "TEST");
+
+        let binance_client = CoinApiClient::new();
+
+        assert!(binance_client.get_headers().contains_key("X-CoinAPI-Key"));
+        assert!(binance_client.get_headers().contains_key("ACCEPT"));
+        assert_eq!(
+            binance_client.get_headers().get("ACCEPT").unwrap(),
+            "application/json"
+        );
+        assert_eq!(
+            binance_client.get_headers().get("X-CoinAPI-Key").unwrap(),
+            "TEST"
+        )
+    }
 }
