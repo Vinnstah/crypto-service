@@ -28,7 +28,6 @@ async fn main() -> Result<()> {
             get(coinapi_service::coinapi_client::get_asset_icons),
         )
         .with_state(state);
-    // .with_state(coinapi_client);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();

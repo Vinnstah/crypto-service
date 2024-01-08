@@ -12,3 +12,13 @@ impl ApiClient {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_api_client() {
+        let api_client = ApiClient::new();
+    }
+}

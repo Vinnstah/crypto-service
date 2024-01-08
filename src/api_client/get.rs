@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-
 use super::{api_client::ApiClient, client_trait::Client};
 use axum::http::StatusCode;
 use serde::{de::DeserializeOwned, Serialize};
+use std::collections::HashMap;
 
 impl ApiClient {
     pub async fn get<Request, Response, T: Client>(
