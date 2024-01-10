@@ -74,30 +74,6 @@ impl QueryItems for OrderBookRequest {
 mod tests {
     use super::*;
 
-    // #[test]
-    // fn orderbook_payload_and_params() {
-    //     let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
-
-    //     let payload: OrderBookRequest =
-    //         serde_json::from_str(orderbook_request).expect("Failed to deserialize request");
-    //     assert_eq!(
-    //         payload,
-    //         OrderBookRequest {
-    //             symbol: "ETHBTC".to_string(),
-    //             limit: Some(1)
-    //         }
-    //     );
-
-    //     let symbol_param = [("symbol", payload.symbol)];
-    //     assert_eq!(symbol_param, [("symbol", "ETHBTC".to_string())]);
-
-    //     let mut limit_param: Vec<(&str, u16)> = vec![];
-    //     if let Some(limit) = payload.limit {
-    //         limit_param.push(("limit", limit));
-    //     }
-    //     assert_eq!(limit_param, vec![("limit", 1)])
-    // }
-
     #[test]
     fn binance_client_and_url() {
         std::env::set_var("BINANCE_API_KEY", "Bearer Key");

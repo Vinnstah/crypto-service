@@ -4,38 +4,41 @@ use serde::{de::DeserializeOwned, Serialize};
 use std::collections::HashMap;
 
 impl ApiClient {
-    pub async fn get<Request, Response, T: Client>(
+    pub async fn get<T, U, C: Client>(
         &self,
-        client_source: T,
+        client_source: C,
         path: &str,
-        payload: Request,
-    ) -> Result<(StatusCode, axum::Json<Response>), (StatusCode, axum::Json<String>)>
+        payload: T,
+    ) -> Result<(StatusCode, axum::Json<U>), (StatusCode, axum::Json<String>)>
     where
-        <Request as QueryItems>::Query: Serialize,
-        Request: QueryItems + std::fmt::Debug,
-        Response: DeserializeOwned,
+        <T as QueryItems>::Query: Serialize,
+        T: QueryItems + std::fmt::Debug,
+        U: DeserializeOwned,
     {
         let mut url = client_source.get_base_url();
         url.push_str(path);
 
-        let response = self
+        // Split out construction of a request
+        let request = self
             .http_client
             .get(url)
             .headers(client_source.get_headers())
             .query(&payload.get_all_queries())
-            .send()
-            .await
-            .unwrap()
-            .json::<Response>()
-            .await;
+            .build()
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, axum::Json(e.to_string())))?;
 
-        match response {
-            Ok(json) => Ok((StatusCode::OK, axum::Json::<Response>(json))),
-            Err(err) => Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                axum::Json(err.to_string()),
-            )),
-        }
+        // Implement Into for API-error type
+        let response_bytes = self
+            .http_client
+            .execute(request)
+            .await
+            .map_err(|e| (StatusCode::BAD_REQUEST, axum::Json(e.to_string())))?;
+
+        response_bytes
+            .json::<U>()
+            .await
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, axum::Json(e.to_string())))
+            .map(|r| (StatusCode::OK, axum::Json::<U>(r)))
     }
 }
 

@@ -152,7 +152,32 @@ mod tests {
     }
 
     #[test]
-    fn orderbook_request_no_limit() {
-        // let orderbook_request = OrderBookRequest::
+    fn orderbook_payload_with_limit() {
+        let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
+
+        let payload: OrderBookRequest =
+            serde_json::from_str(orderbook_request).expect("Failed to deserialize request");
+        assert_eq!(
+            payload,
+            OrderBookRequest {
+                symbol: Value::String("ETHBTC".to_string()),
+                limit: Some(Value::Number(1.into()))
+            }
+        );
+    }
+
+    #[test]
+    fn orderbook_payload_no_limit() {
+        let orderbook_request = r#"{"symbol": "ETHBTC"}"#;
+
+        let payload: OrderBookRequest =
+            serde_json::from_str(orderbook_request).expect("Failed to deserialize request");
+        assert_eq!(
+            payload,
+            OrderBookRequest {
+                symbol: Value::String("ETHBTC".to_string()),
+                limit: None
+            }
+        );
     }
 }
