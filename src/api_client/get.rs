@@ -43,3 +43,39 @@ pub trait QueryItems {
     type Query;
     fn get_all_queries(&self) -> HashMap<&str, Self::Query>;
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use serde_json::Number;
+
+    use crate::{
+        api_client,
+        binance_service::{
+            binance_client::{self, BinanceClient},
+            helpers::{OrderBookRequest, OrderBookResponse},
+        },
+    };
+
+    use super::*;
+
+    #[test]
+    fn get_orderbook() {
+        std::env::set_var("BINANCE_API_KEY", "TEST");
+
+        let api_client = ApiClient::new();
+        let binance_client = BinanceClient::new();
+        let orderbook_request = OrderBookRequest {
+            symbol: serde_json::Value::String("ETHBTC".to_string()),
+            limit: Some(serde_json::Value::Number(Number::from_str("10").unwrap())),
+        };
+
+        let response = api_client
+            .get::<OrderBookRequest, OrderBookResponse, binance_client::BinanceClient>(
+                binance_client,
+                "depth",
+                orderbook_request,
+            );
+    }
+}

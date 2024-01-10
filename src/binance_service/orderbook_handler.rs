@@ -60,9 +60,10 @@ impl QueryItems for OrderBookRequest {
         }
 
         match &self.limit {
-            Value::Number(limit) => {
+            Some(Value::Number(limit)) => {
                 hash_map.insert("limit", serde_json::Value::Number(limit.clone()))
             }
+            None => None,
             _other => panic!("Failed"),
         };
         hash_map
@@ -72,59 +73,6 @@ impl QueryItems for OrderBookRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn new_orderbook_response() {
-        let orderbook_response = OrderBookResponse::new(
-            vec![vec!["55".to_string()]],
-            vec![vec!["44".to_string()]],
-            12345,
-        );
-        assert_eq!(
-            orderbook_response,
-            OrderBookResponse {
-                asks: vec![vec!["55".to_string()]],
-                bids: vec![vec!["44".to_string()]],
-                last_update_id: 12345
-            }
-        )
-    }
-
-    #[test]
-    fn deserialize_orderbook_response() {
-        let orderbook_response_json = r#"
-        {
-            "asks":[["0.05161000","32.45550000"]],
-            "bids":[["0.05160000","133.57940000"]],
-            "lastUpdateId":7010139557}
-        "#;
-
-        let deserialized_orderbook_response: OrderBookResponse =
-            serde_json::from_str(orderbook_response_json).unwrap();
-
-        let orderbook_response = OrderBookResponse::new(
-            vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
-            vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
-            7010139557,
-        );
-
-        assert_eq!(deserialized_orderbook_response, orderbook_response)
-    }
-
-    #[test]
-    fn serialize_orderbook_response() {
-        let orderbook_response = OrderBookResponse::new(
-            vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
-            vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
-            7010139557,
-        );
-
-        let orderbook_response_json = r#"{"asks":[["0.05161000","32.45550000"]],"bids":[["0.05160000","133.57940000"]],"lastUpdateId":7010139557}"#;
-
-        let serialized_orderbook_response = serde_json::to_string(&orderbook_response).unwrap();
-
-        assert_eq!(serialized_orderbook_response, orderbook_response_json)
-    }
 
     // #[test]
     // fn orderbook_payload_and_params() {

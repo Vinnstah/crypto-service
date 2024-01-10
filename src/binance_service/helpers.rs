@@ -1,3 +1,5 @@
+use std::env::set_current_dir;
+
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -11,7 +13,15 @@ pub struct OrderBookResponse {
 }
 
 impl OrderBookResponse {
-    pub fn new(asks: Vec<Vec<String>>, bids: Vec<Vec<String>>, last_update_id: usize) -> Self {
+    pub fn new() -> Self {
+        Self {
+            asks: vec![vec![String::new()]],
+            bids: vec![vec![String::new()]],
+            last_update_id: 0,
+        }
+    }
+
+    pub fn from(asks: Vec<Vec<String>>, bids: Vec<Vec<String>>, last_update_id: usize) -> Self {
         Self {
             asks,
             bids,
@@ -23,7 +33,19 @@ impl OrderBookResponse {
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookRequest {
     pub symbol: Value,
-    pub limit: Value,
+    pub limit: Option<Value>,
+}
+
+impl OrderBookRequest {
+    pub fn from(symbol: Value, limit: Option<Value>) -> Self {
+        Self { symbol, limit }
+    }
+    pub fn new() -> Self {
+        Self {
+            symbol: serde_json::Value::String(String::new()),
+            limit: None,
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
@@ -43,4 +65,94 @@ pub struct RecentTradesResponse {
 
     #[serde(rename = "isBestMatch")]
     pub is_best_match: bool,
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn new_orderbook_response() {
+        let orderbook_response = OrderBookResponse::new();
+        assert_eq!(orderbook_response.asks, vec![vec![String::new()]]);
+        assert_eq!(orderbook_response.bids, vec![vec![String::new()]]);
+        assert_eq!(orderbook_response.last_update_id, 0)
+    }
+
+    #[test]
+    fn orderbook_response_from_data() {
+        let orderbook_response = OrderBookResponse::from(
+            vec![vec!["55".to_string()]],
+            vec![vec!["44".to_string()]],
+            12345,
+        );
+        assert_eq!(
+            orderbook_response,
+            OrderBookResponse {
+                asks: vec![vec!["55".to_string()]],
+                bids: vec![vec!["44".to_string()]],
+                last_update_id: 12345
+            }
+        )
+    }
+
+    #[test]
+    fn orderbook_response_from_data_assert_data() {
+        let orderbook_response = OrderBookResponse::from(
+            vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
+            vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
+            7010139557,
+        );
+        assert_eq!(
+            orderbook_response.asks,
+            vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]]
+        );
+        assert_eq!(
+            orderbook_response.bids,
+            vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]]
+        );
+        assert_eq!(orderbook_response.last_update_id, 7010139557);
+    }
+
+    #[test]
+    fn deserialize_orderbook_response() {
+        let orderbook_response_json = r#"
+    {
+        "asks":[["0.05161000","32.45550000"]],
+        "bids":[["0.05160000","133.57940000"]],
+        "lastUpdateId":7010139557}
+    "#;
+
+        let deserialized_orderbook_response: OrderBookResponse =
+            serde_json::from_str(orderbook_response_json).unwrap();
+
+        let orderbook_response = OrderBookResponse::from(
+            vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
+            vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
+            7010139557,
+        );
+
+        assert_eq!(deserialized_orderbook_response, orderbook_response)
+    }
+
+    #[test]
+    fn serialize_orderbook_response() {
+        let orderbook_response = OrderBookResponse::from(
+            vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
+            vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
+            7010139557,
+        );
+
+        let orderbook_response_json = r#"{"asks":[["0.05161000","32.45550000"]],"bids":[["0.05160000","133.57940000"]],"lastUpdateId":7010139557}"#;
+
+        let serialized_orderbook_response = serde_json::to_string(&orderbook_response).unwrap();
+
+        assert_eq!(serialized_orderbook_response, orderbook_response_json)
+    }
+
+    #[test]
+    fn orderbook_request_no_limit() {
+        // let orderbook_request = OrderBookRequest::
+    }
 }
