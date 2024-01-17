@@ -1,0 +1,24 @@
+use core::fmt::Debug;
+
+#[derive(Debug, Clone)]
+pub struct ApiClient {
+    pub http_client: reqwest::Client,
+}
+
+impl ApiClient {
+    pub fn new() -> Self {
+        Self {
+            http_client: reqwest::Client::new(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_api_client() {
+        let api_client = ApiClient::new();
+    }
+}

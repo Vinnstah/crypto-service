@@ -14,6 +14,7 @@ A Crypto REST API-backend written in Rust with Axum.
 - [ ] Authentication Middleware
 - [x] Add CodeCov
 - [ ] Tests
-- [ ] CI/CD
+- [x] CI/CD
     - [x] Add GitHub Actions
 - [ ] Open API specs
+- [ ] More robust error handling
