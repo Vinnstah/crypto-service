@@ -120,6 +120,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(not(tarpaulin))]
     async fn execute_request() {
         let api_client = ApiClient::new();
         let request = ApiClient::placeholder_binance_client_request();
