@@ -1,1 +1,6 @@
+dictionary Value {
+  string symbol;
+  u32? limit;
+}
+
 namespace crypto_service {};

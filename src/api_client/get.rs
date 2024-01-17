@@ -124,7 +124,9 @@ mod tests {
     async fn execute_request() {
         let api_client = ApiClient::new();
         let request = ApiClient::placeholder_binance_client_request();
-        let response = ApiClient::execute_request(&api_client, request).await.expect("Failed 2");
+        let response = ApiClient::execute_request(&api_client, request)
+            .await
+            .expect("Failed 2");
         assert_eq!(response.status(), 404);
     }
 

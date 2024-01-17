@@ -2,14 +2,15 @@ use std::env::set_current_dir;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use uniffi::Lower;
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct OrderBookResponse {
     pub asks: Vec<Vec<String>>,
     pub bids: Vec<Vec<String>>,
 
     #[serde(rename = "lastUpdateId")]
-    pub last_update_id: usize,
+    pub last_update_id: u64,
 }
 
 impl OrderBookResponse {
@@ -21,7 +22,7 @@ impl OrderBookResponse {
         }
     }
 
-    pub fn from(asks: Vec<Vec<String>>, bids: Vec<Vec<String>>, last_update_id: usize) -> Self {
+    pub fn from(asks: Vec<Vec<String>>, bids: Vec<Vec<String>>, last_update_id: u64) -> Self {
         Self {
             asks,
             bids,
@@ -30,7 +31,7 @@ impl OrderBookResponse {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct OrderBookRequest {
     pub symbol: Value,
     pub limit: Option<Value>,
@@ -48,7 +49,7 @@ impl OrderBookRequest {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct RecentTradesResponse {
     pub id: usize,
     pub price: String,

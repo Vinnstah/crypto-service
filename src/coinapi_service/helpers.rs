@@ -15,17 +15,17 @@ pub trait CoinAPIResponse {
     fn response_body(&self) -> axum::Json<Self::Response>;
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
 pub struct AssetIcons {
     exchange_id: Option<String>,
     asset_id: String,
     url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
 pub struct SymbolsRequest {}
 
-#[derive(PartialEq, Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize, uniffi::Record)]
 pub struct SymbolsResponse {
     symbol_id: Option<String>,
     exchange_id: Option<String>,
@@ -60,7 +60,7 @@ pub struct SymbolsResponse {
     size_precision: Option<f64>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
 pub struct AssetIconsRequest {
     pub size: i32,
 }
