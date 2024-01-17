@@ -89,9 +89,10 @@ pub trait QueryItems {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use std::{any::Any, str::FromStr};
 
     use reqwest::Method;
+    use serde::de::IntoDeserializer;
     use serde_json::Number;
 
     use crate::{
@@ -118,6 +119,41 @@ mod tests {
         assert_eq!(request.url().query().unwrap(), "symbol=ETHBTC&limit=10");
     }
 
+    #[tokio::test]
+    async fn execute_request() {
+        let api_client = ApiClient::new();
+        let request = ApiClient::placeholder_binance_client_request();
+        let response = ApiClient::execute_request(&api_client, request).await.expect("Failed 2");
+        assert_eq!(response.status(), 404);
+    }
+
+    // #[tokio::test]
+    // async fn deserialize_response() {
+    //     let api_client = ApiClient::new();
+    //     let request = ApiClient::placeholder_binance_client_request();
+    //     let response = ApiClient::execute_request(&api_client, request)
+    //         .await
+    //         .expect("Failed");
+    //       let response = r#"
+    //     {
+    //         "asks": [
+    //           [
+    //             "0.05916000",
+    //             "8.77050000"
+    //           ]
+    //         ],
+    //         "bids": [
+    //           [
+    //             "0.05915000",
+    //             "19.49480000"
+    //           ]
+    //         ],
+    //         "lastUpdateId": 7038480085
+    //       }"#;
+    //     let deserialized_response = api_client.deserialize_response::<OrderBookResponse>(response).await;
+    //     assert_eq!(deserialized_response.is_ok(), true);
+    // }
+
     #[test]
     fn get_orderbook() {
         std::env::set_var("BINANCE_API_KEY", "TEST");
@@ -138,7 +174,7 @@ mod tests {
     }
 
     #[test]
-    fn deserialize_response() {
+    fn deserialize_response_json() {
         let response = r#"
         {
             "asks": [
