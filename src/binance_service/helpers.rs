@@ -31,7 +31,7 @@ impl OrderBookResponse {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
 pub struct OrderBookRequest {
     pub symbol: Value,
     pub limit: Option<Value>,
@@ -51,7 +51,7 @@ impl OrderBookRequest {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct RecentTradesResponse {
-    pub id: usize,
+    pub id: u64,
     pub price: String,
 
     #[serde(rename = "qty")]
@@ -59,7 +59,7 @@ pub struct RecentTradesResponse {
 
     #[serde(rename = "quoteQty")]
     pub quote_quantity: String,
-    pub time: usize,
+    pub time: u64,
 
     #[serde(rename = "isBuyerMaker")]
     pub is_buyer_maker: bool,
