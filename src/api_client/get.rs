@@ -16,7 +16,7 @@ impl ApiClient {
         &self,
         client_source: C,
         path: &str,
-        query: Params,
+        query: T,
     ) -> Result<(StatusCode, axum::Json<U>), (StatusCode, axum::Json<String>)>
     where
         <T as QueryItems>::Query: Serialize,
@@ -34,7 +34,6 @@ impl ApiClient {
         &self,
         response_bytes: Response,
     ) -> Result<(StatusCode, axum::Json<U>), (StatusCode, axum::Json<String>)> {
-        println!("{:#?}", response_bytes);
         response_bytes
             .json::<U>()
             .await

@@ -4,11 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::api_client::get::QueryItems;
 
-// pub trait CoinAPIQueryItems {
-//     type Query;
-//     fn get_all_parameters(&self) -> HashMap<&str, Self::Query>;
-// }
-
 pub trait CoinAPIResponse {
     type Response;
 
@@ -23,7 +18,7 @@ pub struct AssetIcons {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
-pub struct SymbolsRequest {}
+pub struct SymbolsParams {}
 
 #[derive(PartialEq, Serialize, Deserialize, uniffi::Record)]
 pub struct SymbolsResponse {
@@ -61,19 +56,21 @@ pub struct SymbolsResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
-pub struct AssetIconsRequest {
+pub struct AssetIconsParams {
     pub size: i32,
 }
 
-impl QueryItems for AssetIconsRequest {
-    type Query = Self;
+impl QueryItems for AssetIconsParams {
+    type Query = i32;
 
     fn get_all_queries(&self) -> HashMap<&str, Self::Query> {
-        HashMap::new()
+        let mut query = HashMap::new();
+        query.insert("size", self.size.clone());
+        query
     }
 }
 
-impl QueryItems for SymbolsRequest {
+impl QueryItems for SymbolsParams {
     type Query = Self;
 
     fn get_all_queries(&self) -> HashMap<&str, Self::Query> {

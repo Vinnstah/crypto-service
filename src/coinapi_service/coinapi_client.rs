@@ -4,10 +4,7 @@ use reqwest::header::{HeaderMap, ACCEPT};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, env, str::FromStr};
 
-use crate::{
-    coinapi_service::helpers::{AssetIcons, AssetIconsRequest},
-    state::AppState,
-};
+use crate::{coinapi_service::helpers::AssetIcons, state::AppState};
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinApiClient {

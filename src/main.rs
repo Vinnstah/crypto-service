@@ -23,8 +23,8 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .route("/v1/orderbooks", get(orderbook_handler::get_order_book))
         .route("/v1/trades", get(orderbook_handler::get_recent_trades))
-        // .route("/v1/symbols/icons", get(assets_handler::get_asset_icons))
-        // .route("/v1/symbols", get(assets_handler::get_symbols))
+        .route("/v1/symbols/icons", get(assets_handler::get_asset_icons))
+        .route("/v1/symbols", get(assets_handler::get_symbols))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();

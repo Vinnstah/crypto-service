@@ -35,26 +35,21 @@ impl QueryItems for Params {
 #[axum::debug_handler]
 pub async fn get_order_book(
     extract::State(state): extract::State<AppState>,
-    Query(params): Query<Params>, // axum::Json(payload): axum::Json<OrderBookRequest>,
+    Query(params): Query<Params>,
 ) -> Result<
     (axum::http::StatusCode, axum::Json<OrderBookResponse>),
     (axum::http::StatusCode, axum::Json<String>),
 > {
-    // println!("{:#?}", &payload);
     state
         .api_client
-        .get::<OrderBookRequest, OrderBookResponse, BinanceClient>(
-            state.binance_client,
-            "depth",
-            params,
-        )
+        .get::<Params, OrderBookResponse, BinanceClient>(state.binance_client, "depth", params)
         .await
 }
 
 #[axum::debug_handler]
 pub async fn get_recent_trades(
     extract::State(state): extract::State<AppState>,
-    Query(params): Query<Params>, // axum::Json(payload): axum::Json<OrderBookRequest>,
+    Query(params): Query<Params>,
 ) -> Result<
     (
         axum::http::StatusCode,
@@ -64,7 +59,7 @@ pub async fn get_recent_trades(
 > {
     state
         .api_client
-        .get::<OrderBookRequest, Vec<RecentTradesResponse>, BinanceClient>(
+        .get::<Params, Vec<RecentTradesResponse>, BinanceClient>(
             state.binance_client,
             "trades",
             params,
