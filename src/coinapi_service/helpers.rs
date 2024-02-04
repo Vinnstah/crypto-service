@@ -65,7 +65,7 @@ impl QueryItems for AssetIconsParams {
 
     fn get_all_queries(&self) -> HashMap<&str, Self::Query> {
         let mut query = HashMap::new();
-        query.insert("size", self.size.clone());
+        query.insert("size", self.size);
         query
     }
 }

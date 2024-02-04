@@ -5,6 +5,12 @@ pub struct ApiClient {
     pub http_client: reqwest::Client,
 }
 
+impl Default for ApiClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ApiClient {
     pub fn new() -> Self {
         Self {

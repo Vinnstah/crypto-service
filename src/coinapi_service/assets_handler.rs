@@ -1,11 +1,11 @@
 use axum::extract::{self, Query};
 
 use crate::{
-    coinapi_service::helpers::{AssetIcons, SymbolsParams, SymbolsResponse},
+    coinapi_service::helpers::{AssetIcons, SymbolsResponse},
     state::AppState,
 };
 
-use super::helpers::AssetIconsParams;
+use super::helpers::{AssetIconsParams, SymbolsParams};
 
 #[axum::debug_handler]
 pub async fn get_asset_icons(
@@ -24,7 +24,7 @@ pub async fn get_asset_icons(
 #[axum::debug_handler]
 pub async fn get_symbols(
     extract::State(state): extract::State<AppState>,
-    Query(params): Query<AssetIconsParams>,
+    Query(params): Query<SymbolsParams>,
 ) -> Result<
     (axum::http::StatusCode, axum::Json<Vec<SymbolsResponse>>),
     (axum::http::StatusCode, axum::Json<String>),

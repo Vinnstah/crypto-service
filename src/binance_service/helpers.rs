@@ -1,8 +1,8 @@
-use std::env::set_current_dir;
+
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use uniffi::Lower;
+
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct OrderBookResponse {
@@ -11,6 +11,12 @@ pub struct OrderBookResponse {
 
     #[serde(rename = "lastUpdateId")]
     pub last_update_id: u64,
+}
+
+impl Default for OrderBookResponse {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl OrderBookResponse {
@@ -35,6 +41,12 @@ impl OrderBookResponse {
 pub struct OrderBookRequest {
     pub symbol: Value,
     pub limit: Option<Value>,
+}
+
+impl Default for OrderBookRequest {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl OrderBookRequest {

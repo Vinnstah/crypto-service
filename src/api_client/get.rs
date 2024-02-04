@@ -1,15 +1,13 @@
-use crate::binance_service::{
-    binance_client::BinanceClient, helpers::OrderBookRequest, orderbook_handler::Params,
-};
+
 
 use super::{
-    api_client::{self, ApiClient},
+    api_client::{ApiClient},
     client_trait::Client,
 };
-use axum::{extract::Query, http::StatusCode};
+use axum::{http::StatusCode};
 use reqwest::{Request, Response};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std::{borrow::Borrow, collections::HashMap, env};
+use serde::{de::DeserializeOwned, Serialize};
+use std::{collections::HashMap};
 
 impl ApiClient {
     pub async fn get<T, U, C: Client>(
