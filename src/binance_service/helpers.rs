@@ -1,8 +1,5 @@
-
-
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct OrderBookResponse {

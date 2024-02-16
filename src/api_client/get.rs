@@ -63,10 +63,6 @@ impl ApiClient {
         let mut url = client_source.get_base_url();
         url.push_str(path);
 
-        // let query: Option<T> = match payload {
-        //     Some(query) => Some(query),
-        //     None => None,
-        // };
 
         self.http_client
             .get(url)

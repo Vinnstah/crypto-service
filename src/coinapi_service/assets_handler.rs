@@ -1,4 +1,5 @@
-use axum::extract::{self, Query};
+use anyhow::Error;
+use axum::{extract::{self, Query, State}};
 
 use crate::{
     coinapi_service::helpers::{AssetIcons, SymbolsResponse},
@@ -7,9 +8,8 @@ use crate::{
 
 use super::helpers::{AssetIconsParams, SymbolsParams};
 
-#[axum::debug_handler]
 pub async fn get_asset_icons(
-    extract::State(state): extract::State<AppState>,
+    State(state): extract::State<AppState>,
     Query(params): Query<AssetIconsParams>,
 ) -> Result<
     (axum::http::StatusCode, axum::Json<Vec<AssetIcons>>),
@@ -21,9 +21,8 @@ pub async fn get_asset_icons(
         .await
 }
 
-#[axum::debug_handler]
 pub async fn get_symbols(
-    extract::State(state): extract::State<AppState>,
+    State(state): extract::State<AppState>,
     Query(params): Query<SymbolsParams>,
 ) -> Result<
     (axum::http::StatusCode, axum::Json<Vec<SymbolsResponse>>),
@@ -34,3 +33,4 @@ pub async fn get_symbols(
         .get(state.coinapi_client, "symbols", params)
         .await
 }
+

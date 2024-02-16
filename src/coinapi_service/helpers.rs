@@ -10,6 +10,7 @@ pub trait CoinAPIResponse {
     fn response_body(&self) -> axum::Json<Self::Response>;
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
 pub struct AssetIcons {
     exchange_id: Option<String>,

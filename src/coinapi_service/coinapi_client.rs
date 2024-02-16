@@ -1,10 +1,6 @@
-
 use core::fmt::Debug;
 use reqwest::header::{HeaderMap, ACCEPT};
-
 use std::{env};
-
-
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinApiClient {

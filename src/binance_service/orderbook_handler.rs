@@ -12,7 +12,7 @@ use axum::extract::{self, Query};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, uniffi::Record)]
 #[allow(dead_code)]
 pub struct Params {
     pub symbol: String,

@@ -1,12 +1,17 @@
 use anyhow::Result;
-use axum::{routing::get, Router};
+use axum::{extract::Query, routing::get, Router};
+use crypto_service::binance_service::helpers::OrderBookResponse;
+use crypto_service::binance_service::orderbook_handler::{get_order_book, Params};
+use crypto_service::UniFfiTag;
 use crypto_service::{
     api_client::api_client::ApiClient,
-    binance_service::{
-        binance_client::BinanceClient,
-        orderbook_handler::{self},
+    binance_service::{binance_client::BinanceClient, orderbook_handler},
+    coinapi_service::{
+        self,
+        assets_handler::{self, get_symbols},
+        coinapi_client::CoinApiClient,
+        helpers::{SymbolsParams, SymbolsResponse},
     },
-    coinapi_service::{self, assets_handler, coinapi_client::CoinApiClient},
     state::AppState,
 };
 
@@ -29,6 +34,41 @@ async fn main() -> Result<()> {
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
-
+    // todo!("Split into 2 crates under a workspace like: https://github.com/radixdlt/radix-engine-toolkit/tree/main");
     Ok(())
+}
+
+/// APA BANAN
+#[uniffi::export]
+pub async fn get_symbols_binding(params: SymbolsParams) -> Vec<SymbolsResponse> {
+    let binance_client: BinanceClient = BinanceClient::new();
+    let coinapi_client: CoinApiClient = CoinApiClient::new();
+    let api_client = ApiClient::new();
+
+    let state = AppState::new(binance_client, coinapi_client, api_client);
+
+    get_symbols(
+        axum::extract::State(state),
+        Query::from(axum::extract::Query(params)),
+    )
+    .await
+    .map(|x| x.1 .0)
+    .unwrap()
+}
+
+
+#[uniffi::export]
+pub async fn get_orderbook_binding(params: Params) -> OrderBookResponse {
+    let binance_client: BinanceClient = BinanceClient::new();
+    let coinapi_client: CoinApiClient = CoinApiClient::new();
+    let api_client = ApiClient::new();
+    let state = AppState::new(binance_client, coinapi_client, api_client);
+
+    get_order_book(
+        axum::extract::State(state),
+        Query::from(axum::extract::Query(params)),
+    )
+    .await
+    .map(|r| r.1 .0)
+    .expect("Failed to get Orderbook")
 }
