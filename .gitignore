@@ -1,5 +1,5 @@
+!/target/ios/libcrypto_service-rs.xcframework
 /target
 .env
 Cargo.lock
 tarpaulin-report.html
-!/target/ios
