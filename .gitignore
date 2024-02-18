@@ -2,3 +2,4 @@
 .env
 Cargo.lock
 tarpaulin-report.html
+!/target/ios
