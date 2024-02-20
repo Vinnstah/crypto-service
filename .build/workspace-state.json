@@ -1,0 +1,26 @@
+{
+  "object" : {
+    "artifacts" : [
+      {
+        "kind" : "xcframework",
+        "packageRef" : {
+          "identity" : "crypto_service",
+          "kind" : "root",
+          "location" : "/Users/viktorjansson/Developer/Rust/crypto_service",
+          "name" : "crypto_service"
+        },
+        "path" : "/Users/viktorjansson/Developer/Rust/crypto_service/.build/artifacts/crypto_service/Colossus/target/ios/libsargon-rs.xcframework",
+        "source" : {
+          "checksum" : "befef7d56108305ff6ff69d67483471395c3e603e299b3b15f5a826328de272b",
+          "type" : "remote",
+          "url" : "https://github.com/radixdlt/sargon/releases/download/0.1.0/libsargon-rs.xcframework.zip"
+        },
+        "targetName" : "Colossus"
+      }
+    ],
+    "dependencies" : [
+
+    ]
+  },
+  "version" : 6
+}

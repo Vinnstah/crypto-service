@@ -1,4 +1,6 @@
-/target
+/target/*
+# !target/ios
 .env
 Cargo.lock
 tarpaulin-report.html
+.vscode

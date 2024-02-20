@@ -1,15 +1,19 @@
-use std::env::set_current_dir;
-
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct OrderBookResponse {
     pub asks: Vec<Vec<String>>,
     pub bids: Vec<Vec<String>>,
 
     #[serde(rename = "lastUpdateId")]
-    pub last_update_id: usize,
+    pub last_update_id: u64,
+}
+
+impl Default for OrderBookResponse {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl OrderBookResponse {
@@ -21,7 +25,7 @@ impl OrderBookResponse {
         }
     }
 
-    pub fn from(asks: Vec<Vec<String>>, bids: Vec<Vec<String>>, last_update_id: usize) -> Self {
+    pub fn from(asks: Vec<Vec<String>>, bids: Vec<Vec<String>>, last_update_id: u64) -> Self {
         Self {
             asks,
             bids,
@@ -36,6 +40,12 @@ pub struct OrderBookRequest {
     pub limit: Option<Value>,
 }
 
+impl Default for OrderBookRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl OrderBookRequest {
     pub fn from(symbol: Value, limit: Option<Value>) -> Self {
         Self { symbol, limit }
@@ -48,9 +58,9 @@ impl OrderBookRequest {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct RecentTradesResponse {
-    pub id: usize,
+    pub id: u64,
     pub price: String,
 
     #[serde(rename = "qty")]
@@ -58,7 +68,7 @@ pub struct RecentTradesResponse {
 
     #[serde(rename = "quoteQty")]
     pub quote_quantity: String,
-    pub time: usize,
+    pub time: u64,
 
     #[serde(rename = "isBuyerMaker")]
     pub is_buyer_maker: bool,

@@ -4,28 +4,24 @@ use serde::{Deserialize, Serialize};
 
 use crate::api_client::get::QueryItems;
 
-// pub trait CoinAPIQueryItems {
-//     type Query;
-//     fn get_all_parameters(&self) -> HashMap<&str, Self::Query>;
-// }
-
 pub trait CoinAPIResponse {
     type Response;
 
     fn response_body(&self) -> axum::Json<Self::Response>;
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+
+#[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
 pub struct AssetIcons {
     exchange_id: Option<String>,
     asset_id: String,
     url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct SymbolsRequest {}
+#[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
+pub struct SymbolsParams {}
 
-#[derive(PartialEq, Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize, uniffi::Record)]
 pub struct SymbolsResponse {
     symbol_id: Option<String>,
     exchange_id: Option<String>,
@@ -60,20 +56,22 @@ pub struct SymbolsResponse {
     size_precision: Option<f64>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct AssetIconsRequest {
+#[derive(Serialize, Deserialize, Debug, Default, uniffi::Record)]
+pub struct AssetIconsParams {
     pub size: i32,
 }
 
-impl QueryItems for AssetIconsRequest {
-    type Query = Self;
+impl QueryItems for AssetIconsParams {
+    type Query = i32;
 
     fn get_all_queries(&self) -> HashMap<&str, Self::Query> {
-        HashMap::new()
+        let mut query = HashMap::new();
+        query.insert("size", self.size);
+        query
     }
 }
 
-impl QueryItems for SymbolsRequest {
+impl QueryItems for SymbolsParams {
     type Query = Self;
 
     fn get_all_queries(&self) -> HashMap<&str, Self::Query> {

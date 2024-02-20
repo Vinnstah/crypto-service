@@ -1,12 +1,13 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
+
 use crypto_service::{
     api_client::api_client::ApiClient,
-    binance_service::{
-        binance_client::BinanceClient,
-        orderbook_handler::{self},
+    binance_service::{binance_client::BinanceClient, orderbook_handler},
+    coinapi_service::{
+        assets_handler::{self},
+        coinapi_client::CoinApiClient,
     },
-    coinapi_service::{self, assets_handler, coinapi_client::CoinApiClient},
     state::AppState,
 };
 
@@ -29,6 +30,6 @@ async fn main() -> Result<()> {
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
-
+    // todo!("Split into 2 crates under a workspace like: https://github.com/radixdlt/radix-engine-toolkit/tree/main");
     Ok(())
 }

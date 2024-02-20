@@ -1,18 +1,17 @@
-use axum::{extract, http::StatusCode};
 use core::fmt::Debug;
 use reqwest::header::{HeaderMap, ACCEPT};
-use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, env, str::FromStr};
-
-use crate::{
-    coinapi_service::helpers::{AssetIcons, AssetIconsRequest},
-    state::AppState,
-};
+use std::{env};
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinApiClient {
     pub headers: HeaderMap,
     pub base_url: String,
+}
+
+impl Default for CoinApiClient {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CoinApiClient {
