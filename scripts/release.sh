@@ -37,22 +37,22 @@ XCFRAME_ZIP_PATH=`echo "$OUTPUT_OF_BUILD" | cut -d ";" -f 2` || exit $?
 echo "🚢  CHECKSUM: $CHECKSUM"
 echo "🚢  XCFRAME_ZIP_PATH: $XCFRAME_ZIP_PATH"
 
-GIT_ADD_CMD="git add Package.swift apple/Sources/UniFFI/CryptoService.swift"
+GIT_ADD_CMD="git add Package.swift apple/Sources/UniFFI/crypto_service.swift"
 echo "🚢  Staging (potentially) changed files with: $GIT_ADD_CMD"
 eval $GIT_ADD_CMD
 
 GIT_COMMIT_CMD="git commit -m \"Release of '$NEXT_TAG' (updated Package.swift with new checksum and path to zip on Github, and maybe apple/Sources/UniFFI/CryptoService.swift). This commit is not merged into main/develop branch (and need not be).\" --no-verify"
-echo "🚢  Git commiting changes to Package.swift (and maybe CryptoService.swift)"
+echo "🚢  Git commiting changes to Package.swift (and maybe crypto_service.swift)"
 eval $GIT_COMMIT_CMD
 
 `git tag $NEXT_TAG`
 echo "🚢 🏷️ 📡 Pushing tag: $(NEXT_TAG), but only tag, not commit."
-`git push origin $NEXT_TAG`
+`git push main $NEXT_TAG`
 
 # This MUST match whatever you we have declared in `$PROJECT_ROOT/Package.swift`
 SWIFT_CRYPTOSERVICE_BINARY_ASSET_NAME="libcrypto_service-rs.xcframework.zip" 
 
-GH_RELEASE_TITLE="CryptoService Swift Only v$NEXT_TAG"
+GH_RELEASE_TITLE="crypto_service Swift Only v$NEXT_TAG"
 RELEASE_CMD="gh release create $NEXT_TAG '$XCFRAME_ZIP_PATH#$SWIFT_CRYPTOSERVICE_BINARY_ASSET_NAME' --generate-notes --title '$GH_RELEASE_TITLE'"
 eval $RELEASE_CMD
 
