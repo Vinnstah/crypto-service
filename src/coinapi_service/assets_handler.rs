@@ -1,12 +1,10 @@
-use anyhow::Error;
-use axum::{extract::{self, Query, State}};
+use axum::extract::{self, Query, State};
 
 use crate::{
-    coinapi_service::helpers::{AssetIcons, SymbolsResponse},
-    state::AppState,
+    api_client::api_client::ApiClient, binance_service::binance_client::BinanceClient, coinapi_service::helpers::{AssetIcons, SymbolsResponse}, state::AppState
 };
 
-use super::helpers::{AssetIconsParams, SymbolsParams};
+use super::{coinapi_client::CoinApiClient, helpers::{AssetIconsParams, SymbolsParams}};
 
 pub async fn get_asset_icons(
     State(state): extract::State<AppState>,
@@ -32,5 +30,22 @@ pub async fn get_symbols(
         .api_client
         .get(state.coinapi_client, "symbols", params)
         .await
+}
+
+#[uniffi::export]
+pub async fn get_symbols_binding(params: SymbolsParams) -> Vec<SymbolsResponse> {
+    let binance_client: BinanceClient = BinanceClient::new();
+    let coinapi_client: CoinApiClient = CoinApiClient::new();
+    let api_client = ApiClient::new();
+
+    let state = AppState::new(binance_client, coinapi_client, api_client);
+
+    get_symbols(
+        axum::extract::State(state),
+        Query::from(axum::extract::Query(params)),
+    )
+    .await
+    .map(|x| x.1 .0)
+    .unwrap()
 }
 

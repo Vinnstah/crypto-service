@@ -1,12 +1,10 @@
 use std::collections::HashMap;
 
 use crate::{
-    api_client::get::QueryItems,
-    binance_service::{
+    api_client::{api_client::ApiClient, get::QueryItems}, binance_service::{
         binance_client::BinanceClient,
         helpers::{OrderBookRequest, OrderBookResponse, RecentTradesResponse},
-    },
-    state::AppState,
+    }, coinapi_service::coinapi_client::CoinApiClient, state::AppState
 };
 use axum::extract::{self, Query};
 use serde::{Deserialize, Serialize};
@@ -85,6 +83,22 @@ impl QueryItems for OrderBookRequest {
         };
         hash_map
     }
+}
+
+#[uniffi::export]
+pub async fn get_orderbook_binding(params: Params) -> OrderBookResponse {
+    let binance_client: BinanceClient = BinanceClient::new();
+    let coinapi_client: CoinApiClient = CoinApiClient::new();
+    let api_client = ApiClient::new();
+    let state = AppState::new(binance_client, coinapi_client, api_client);
+
+    get_order_book(
+        axum::extract::State(state),
+        Query::from(axum::extract::Query(params)),
+    )
+    .await
+    .map(|r| r.1 .0)
+    .expect("Failed to get Orderbook")
 }
 
 #[cfg(test)]

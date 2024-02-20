@@ -1,13 +1,11 @@
-
-
 use super::{
-    api_client::{ApiClient},
+    api_client::ApiClient,
     client_trait::Client,
 };
-use axum::{http::StatusCode};
+use axum::http::StatusCode;
 use reqwest::{Request, Response};
 use serde::{de::DeserializeOwned, Serialize};
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 impl ApiClient {
     pub async fn get<T, U, C: Client>(
