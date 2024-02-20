@@ -1116,6 +1116,28 @@ private struct FfiConverterSequenceString: FfiConverterRustBuffer {
     }
 }
 
+private struct FfiConverterSequenceTypeSymbolsResponse: FfiConverterRustBuffer {
+    typealias SwiftType = [SymbolsResponse]
+
+    public static func write(_ value: [SymbolsResponse], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeSymbolsResponse.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [SymbolsResponse] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [SymbolsResponse]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            try seq.append(FfiConverterTypeSymbolsResponse.read(from: &buf))
+        }
+        return seq
+    }
+}
+
 private struct FfiConverterSequenceSequenceString: FfiConverterRustBuffer {
     typealias SwiftType = [[String]]
 
@@ -1138,6 +1160,95 @@ private struct FfiConverterSequenceSequenceString: FfiConverterRustBuffer {
     }
 }
 
+private let UNIFFI_RUST_FUTURE_POLL_READY: Int8 = 0
+private let UNIFFI_RUST_FUTURE_POLL_MAYBE_READY: Int8 = 1
+
+private func uniffiRustCallAsync<F, T>(
+    rustFutureFunc: () -> UnsafeMutableRawPointer,
+    pollFunc: (UnsafeMutableRawPointer, @escaping UniFfiRustFutureContinuation, UnsafeMutableRawPointer) -> Void,
+    completeFunc: (UnsafeMutableRawPointer, UnsafeMutablePointer<RustCallStatus>) -> F,
+    freeFunc: (UnsafeMutableRawPointer) -> Void,
+    liftFunc: (F) throws -> T,
+    errorHandler: ((RustBuffer) throws -> Error)?
+) async throws -> T {
+    // Make sure to call uniffiEnsureInitialized() since future creation doesn't have a
+    // RustCallStatus param, so doesn't use makeRustCall()
+    uniffiEnsureInitialized()
+    let rustFuture = rustFutureFunc()
+    defer {
+        freeFunc(rustFuture)
+    }
+    var pollResult: Int8
+    repeat {
+        pollResult = await withUnsafeContinuation {
+            pollFunc(rustFuture, uniffiFutureContinuationCallback, ContinuationHolder($0).toOpaque())
+        }
+    } while pollResult != UNIFFI_RUST_FUTURE_POLL_READY
+
+    return try liftFunc(makeRustCall(
+        { completeFunc(rustFuture, $0) },
+        errorHandler: errorHandler
+    ))
+}
+
+// Callback handlers for an async calls.  These are invoked by Rust when the future is ready.  They
+// lift the return value or error and resume the suspended function.
+private func uniffiFutureContinuationCallback(ptr: UnsafeMutableRawPointer, pollResult: Int8) {
+    ContinuationHolder.fromOpaque(ptr).resume(pollResult)
+}
+
+// Wraps UnsafeContinuation in a class so that we can use reference counting when passing it across
+// the FFI
+private class ContinuationHolder {
+    let continuation: UnsafeContinuation<Int8, Never>
+
+    init(_ continuation: UnsafeContinuation<Int8, Never>) {
+        self.continuation = continuation
+    }
+
+    func resume(_ pollResult: Int8) {
+        continuation.resume(returning: pollResult)
+    }
+
+    func toOpaque() -> UnsafeMutableRawPointer {
+        return Unmanaged<ContinuationHolder>.passRetained(self).toOpaque()
+    }
+
+    static func fromOpaque(_ ptr: UnsafeRawPointer) -> ContinuationHolder {
+        return Unmanaged<ContinuationHolder>.fromOpaque(ptr).takeRetainedValue()
+    }
+}
+
+public func getOrderbookBinding(params: Params) async -> OrderBookResponse {
+    return try! await uniffiRustCallAsync(
+        rustFutureFunc: {
+            uniffi_crypto_service_fn_func_get_orderbook_binding(
+                FfiConverterTypeParams.lower(params)
+            )
+        },
+        pollFunc: ffi_crypto_service_rust_future_poll_rust_buffer,
+        completeFunc: ffi_crypto_service_rust_future_complete_rust_buffer,
+        freeFunc: ffi_crypto_service_rust_future_free_rust_buffer,
+        liftFunc: FfiConverterTypeOrderBookResponse.lift,
+        errorHandler: nil
+    )
+}
+
+public func getSymbolsBinding(params: SymbolsParams) async -> [SymbolsResponse] {
+    return try! await uniffiRustCallAsync(
+        rustFutureFunc: {
+            uniffi_crypto_service_fn_func_get_symbols_binding(
+                FfiConverterTypeSymbolsParams.lower(params)
+            )
+        },
+        pollFunc: ffi_crypto_service_rust_future_poll_rust_buffer,
+        completeFunc: ffi_crypto_service_rust_future_complete_rust_buffer,
+        freeFunc: ffi_crypto_service_rust_future_free_rust_buffer,
+        liftFunc: FfiConverterSequenceTypeSymbolsResponse.lift,
+        errorHandler: nil
+    )
+}
+
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -1153,6 +1264,12 @@ private var initializationResult: InitializationResult {
     let scaffolding_contract_version = ffi_crypto_service_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
+    }
+    if uniffi_crypto_service_checksum_func_get_orderbook_binding() != 12445 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_crypto_service_checksum_func_get_symbols_binding() != 57958 {
+        return InitializationResult.apiChecksumMismatch
     }
 
     return InitializationResult.ok
