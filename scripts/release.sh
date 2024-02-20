@@ -47,7 +47,7 @@ eval $GIT_COMMIT_CMD
 
 `git tag $NEXT_TAG`
 echo "🚢 🏷️ 📡 Pushing tag: $(NEXT_TAG), but only tag, not commit."
-`git push main $NEXT_TAG`
+`git push origin $NEXT_TAG`
 
 # This MUST match whatever you we have declared in `$PROJECT_ROOT/Package.swift`
 SWIFT_CRYPTOSERVICE_BINARY_ASSET_NAME="libcrypto_service-rs.xcframework.zip" 
