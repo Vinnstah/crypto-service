@@ -7,7 +7,7 @@ me=$(basename "$0")
 REL_DIR=$0:P
 DIR="$( cd "$( dirname "$REL_DIR" )" && pwd )";
 cd "$DIR" 
-cd "../../" # go to parent of parent, which is project root.
+cd "../" # go to parent of parent, which is project root.
 
 echo "🚢 Start of '$me' (see: '$DIR/$me')"
 echo "🚢 PWD: $PWD"
