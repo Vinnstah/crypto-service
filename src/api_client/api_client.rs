@@ -1,7 +1,5 @@
 use core::fmt::Debug;
 
-use uniffi::Lower;
-
 #[derive(Debug, Clone)]
 pub struct ApiClient {
     pub http_client: reqwest::Client,
@@ -12,7 +10,6 @@ impl Default for ApiClient {
         Self::new()
     }
 }
-
 
 impl ApiClient {
     pub fn new() -> Self {
