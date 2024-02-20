@@ -93,7 +93,7 @@ cargo build --lib --release --target x86_64-apple-ios
 cargo build --lib --release --target aarch64-apple-ios-sim
 cargo build --lib --release --target aarch64-apple-ios
 
-basename=crypto_service
+basename=CryptoService
 generate_ffi $basename
 create_fat_simulator_lib $basename
 OUTPUT_OF_BUILD=$(build_xcframework $basename)

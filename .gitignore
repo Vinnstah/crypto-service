@@ -3,3 +3,4 @@
 .env
 Cargo.lock
 tarpaulin-report.html
+.vscode
