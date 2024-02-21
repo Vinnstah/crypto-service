@@ -37,7 +37,7 @@ XCFRAME_ZIP_PATH=`echo "$OUTPUT_OF_BUILD" | cut -d ";" -f 2` || exit $?
 echo "🚢  CHECKSUM: $CHECKSUM"
 echo "🚢  XCFRAME_ZIP_PATH: $XCFRAME_ZIP_PATH"
 
-GIT_ADD_CMD="git add Package.swift apple/Sources/UniFFI/crypto_service.swift"
+GIT_ADD_CMD="git add --force Package.swift apple/Sources/UniFFI/crypto_service.swift"
 echo "🚢  Staging (potentially) changed files with: $GIT_ADD_CMD"
 eval $GIT_ADD_CMD
 
