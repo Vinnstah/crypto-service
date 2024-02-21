@@ -43,5 +43,10 @@ let package = Package(
 			dependencies: [.target(name: cryptoServiceBinaryTargetName)],
 			path: "apple/Sources/UniFFI"
 		),
+		.target(
+			name: "Colossus",
+			dependencies: ["CryptoServiceUniFFI",],
+			path: "apple/Sources/Colossus"
+		),
 	]
 )
