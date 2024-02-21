@@ -3,7 +3,7 @@
 
 import PackageDescription
 
-let cryptoServiceBinaryTargetName = "CryptoService"
+let cryptoServiceBinaryTargetName = "CryptoServiceRS"
 let binaryTarget: Target
 let useLocalFramework = false
 
@@ -44,9 +44,9 @@ let package = Package(
 			path: "apple/Sources/UniFFI"
 		),
 		.target(
-			name: "Colossus",
+			name: "CryptoService",
 			dependencies: ["CryptoServiceUniFFI",],
-			path: "apple/Sources/Colossus"
+			path: "apple/Sources/CryptoService"
 		),
 	]
 )
