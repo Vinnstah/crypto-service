@@ -31,6 +31,23 @@ impl BinanceClient {
             base_url: "https://api.binance.com/api/v3/".to_string(),
         }
     }
+
+    pub fn new_with_api_key(key: String) -> Self {
+        Self {
+            headers: {
+                let mut headers = HeaderMap::new();
+                headers.insert("X-MBX-APIKEY", key.parse().expect("Failed to parse key"));
+                headers.insert(
+                    CONTENT_TYPE,
+                    "application/x-www-form-urlencoded"
+                        .parse()
+                        .expect("Failed to parse header"),
+                );
+                headers
+            },
+            base_url: "https://api.binance.com/api/v3/".to_string(),
+        }
+    }
 }
 
 impl Default for BinanceClient {

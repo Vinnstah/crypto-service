@@ -7,7 +7,7 @@ extension Client {
       await getSymbolsBinding(params: params) 
     }
 
-    public func getOrderbook(params: Params) async -> OrderBook {
-      await getOrderbookBinding(params: params) 
+    public func getOrderbook(params: Params, key: String) async -> OrderBook {
+      await getOrderbookBinding(params: params, key: key) 
     }
 }
