@@ -89,9 +89,9 @@ impl QueryItems for OrderBookRequest {
 }
 
 #[uniffi::export]
-pub async fn get_orderbook_binding(params: Params, key: String) -> OrderBook {
-    let binance_client: BinanceClient = BinanceClient::new_with_api_key(key);
-    let coinapi_client: CoinApiClient = CoinApiClient::new();
+pub async fn get_orderbook_binding(params: Params, binance_key: String, coin_key: String) -> OrderBook {
+    let binance_client: BinanceClient = BinanceClient::new_with_api_key(binance_key);
+    let coinapi_client: CoinApiClient = CoinApiClient::new_with_api_key(coin_key);
     let api_client = ApiClient::new();
     let state = AppState::new(binance_client, coinapi_client, api_client);
 

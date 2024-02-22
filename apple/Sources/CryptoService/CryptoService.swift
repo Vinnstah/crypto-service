@@ -1,5 +1,11 @@
 public struct Client {
-  public init() {}
+  let binanceKey: String
+  let coinApiKey: String
+
+  public init(binanceKey: String, coinApiKey: String) {
+    self.binanceKey = binanceKey
+    self.coinApiKey = coinApiKey
+  }
 }
 
 extension Client {
@@ -7,7 +13,9 @@ extension Client {
       await getSymbolsBinding(params: params) 
     }
 
-    public func getOrderbook(params: Params, key: String) async -> OrderBook {
-      await getOrderbookBinding(params: params, key: key) 
+    public func getOrderbook(params: Params) async -> OrderBook {
+      await getOrderbookBinding(params: params, binance_key: self.binanceKey, coin_key: self.coinApiKey) 
     }
 }
+
+// Fix API-KEY for CoinApi since we instantiate both when creating the CLient for State. 

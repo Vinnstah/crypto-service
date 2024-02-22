@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 use reqwest::header::{HeaderMap, ACCEPT};
-use std::{env};
+use std::env;
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinApiClient {
@@ -25,6 +25,23 @@ impl CoinApiClient {
                         .expect("No API-key found")
                         .parse()
                         .expect("Failed to parse header"),
+                );
+                headers.insert(
+                    ACCEPT,
+                    "application/json".parse().expect("Failed to parse header"),
+                );
+                headers
+            },
+            base_url: "https://rest.coinapi.io/v1/".to_string(),
+        }
+    }
+    pub fn new_with_api_key(key: String) -> Self {
+        Self {
+            headers: {
+                let mut headers = HeaderMap::new();
+                headers.insert(
+                    "X-CoinAPI-Key",
+                    key.parse().expect("Failed to parse header"),
                 );
                 headers.insert(
                     ACCEPT,
