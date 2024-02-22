@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
-pub struct OrderBookResponse {
+pub struct OrderBook {
     pub asks: Vec<Vec<String>>,
     pub bids: Vec<Vec<String>>,
 
@@ -10,13 +10,13 @@ pub struct OrderBookResponse {
     pub last_update_id: u64,
 }
 
-impl Default for OrderBookResponse {
+impl Default for OrderBook {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl OrderBookResponse {
+impl OrderBook {
     pub fn new() -> Self {
         Self {
             asks: vec![vec![String::new()]],
@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn new_orderbook_response() {
-        let orderbook_response = OrderBookResponse::new();
+        let orderbook_response = OrderBook::new();
         assert_eq!(orderbook_response.asks, vec![vec![String::new()]]);
         assert_eq!(orderbook_response.bids, vec![vec![String::new()]]);
         assert_eq!(orderbook_response.last_update_id, 0)
@@ -92,14 +92,14 @@ mod tests {
 
     #[test]
     fn orderbook_response_from_data() {
-        let orderbook_response = OrderBookResponse::from(
+        let orderbook_response = OrderBook::from(
             vec![vec!["55".to_string()]],
             vec![vec!["44".to_string()]],
             12345,
         );
         assert_eq!(
             orderbook_response,
-            OrderBookResponse {
+            OrderBook {
                 asks: vec![vec!["55".to_string()]],
                 bids: vec![vec!["44".to_string()]],
                 last_update_id: 12345
@@ -109,7 +109,7 @@ mod tests {
 
     #[test]
     fn orderbook_response_from_data_assert_data() {
-        let orderbook_response = OrderBookResponse::from(
+        let orderbook_response = OrderBook::from(
             vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
             vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
             7010139557,
@@ -134,10 +134,10 @@ mod tests {
         "lastUpdateId":7010139557}
     "#;
 
-        let deserialized_orderbook_response: OrderBookResponse =
+        let deserialized_orderbook_response: OrderBook =
             serde_json::from_str(orderbook_response_json).unwrap();
 
-        let orderbook_response = OrderBookResponse::from(
+        let orderbook_response = OrderBook::from(
             vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
             vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
             7010139557,
@@ -148,7 +148,7 @@ mod tests {
 
     #[test]
     fn serialize_orderbook_response() {
-        let orderbook_response = OrderBookResponse::from(
+        let orderbook_response = OrderBook::from(
             vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
             vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
             7010139557,

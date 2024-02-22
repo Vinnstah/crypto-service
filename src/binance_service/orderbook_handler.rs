@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 
 use crate::{
-    api_client::{api_client::ApiClient, get::QueryItems}, binance_service::{
+    api_client::{api_client::ApiClient, get::QueryItems},
+    binance_service::{
         binance_client::BinanceClient,
-        helpers::{OrderBookRequest, OrderBookResponse, RecentTradesResponse},
-    }, coinapi_service::coinapi_client::CoinApiClient, state::AppState
+        helpers::{OrderBook, OrderBookRequest, RecentTradesResponse},
+    },
+    coinapi_service::coinapi_client::CoinApiClient,
+    state::AppState,
 };
 use axum::extract::{self, Query};
 use serde::{Deserialize, Serialize};
@@ -35,12 +38,12 @@ pub async fn get_order_book(
     extract::State(state): extract::State<AppState>,
     Query(params): Query<Params>,
 ) -> Result<
-    (axum::http::StatusCode, axum::Json<OrderBookResponse>),
+    (axum::http::StatusCode, axum::Json<OrderBook>),
     (axum::http::StatusCode, axum::Json<String>),
 > {
     state
         .api_client
-        .get::<Params, OrderBookResponse, BinanceClient>(state.binance_client, "depth", params)
+        .get::<Params, OrderBook, BinanceClient>(state.binance_client, "depth", params)
         .await
 }
 
@@ -86,7 +89,7 @@ impl QueryItems for OrderBookRequest {
 }
 
 #[uniffi::export]
-pub async fn get_orderbook_binding(params: Params) -> OrderBookResponse {
+pub async fn get_orderbook_binding(params: Params) -> OrderBook {
     let binance_client: BinanceClient = BinanceClient::new();
     let coinapi_client: CoinApiClient = CoinApiClient::new();
     let api_client = ApiClient::new();
@@ -133,7 +136,7 @@ mod tests {
     //         let orderbook_request = r#"{"symbol": "ETHBTC", "limit": 1}"#;
     //         let payload: OrderBookRequest = serde_json::from_str(orderbook_request).unwrap();
 
-    //         let result: (axum::http::StatusCode, axum::Json<OrderBookResponse>) =
+    //         let result: (axum::http::StatusCode, axum::Json<OrderBook>) =
     //         get_order_book(axum::extract::State(state), axum::Json(payload))
     //         .await
     //         .unwrap();
@@ -141,7 +144,7 @@ mod tests {
     //     assert_eq!(result.0, StatusCode::OK);
     //     assert_ne!(
     //         result.1 .0,
-    //         OrderBookResponse::new(
+    //         OrderBook::new(
     //             vec![vec!["0.05161000".to_string(), "32.45550000".to_string()]],
     //             vec![vec!["0.05160000".to_string(), "133.57940000".to_string()]],
     //             7010139557,

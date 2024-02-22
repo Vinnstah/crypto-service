@@ -1,7 +1,4 @@
-use super::{
-    api_client::ApiClient,
-    client_trait::Client,
-};
+use super::{api_client::ApiClient, client_trait::Client};
 use axum::http::StatusCode;
 use reqwest::{Request, Response};
 use serde::{de::DeserializeOwned, Serialize};
@@ -61,7 +58,6 @@ impl ApiClient {
         let mut url = client_source.get_base_url();
         url.push_str(path);
 
-
         self.http_client
             .get(url)
             .headers(client_source.get_headers())
@@ -100,7 +96,7 @@ mod tests {
         api_client,
         binance_service::{
             binance_client::{self, BinanceClient},
-            helpers::{OrderBookRequest, OrderBookResponse},
+            helpers::{OrderBook, OrderBookRequest},
         },
     };
 
@@ -154,7 +150,7 @@ mod tests {
     //         ],
     //         "lastUpdateId": 7038480085
     //       }"#;
-    //     let deserialized_response = api_client.deserialize_response::<OrderBookResponse>(response).await;
+    //     let deserialized_response = api_client.deserialize_response::<OrderBook>(response).await;
     //     assert_eq!(deserialized_response.is_ok(), true);
     // }
 
@@ -170,7 +166,7 @@ mod tests {
     //     };
 
     //     let response = api_client
-    //         .get::<OrderBookRequest, OrderBookResponse, binance_client::BinanceClient>(
+    //         .get::<OrderBookRequest, OrderBook, binance_client::BinanceClient>(
     //             binance_client,
     //             "depth",
     //             orderbook_request,
@@ -267,7 +263,7 @@ mod tests {
             ],
             "lastUpdateId": 7038480085
           }"#;
-        let deserialized_response: OrderBookResponse = serde_json::from_str(response).unwrap();
+        let deserialized_response: OrderBook = serde_json::from_str(response).unwrap();
         assert_eq!(deserialized_response.last_update_id, 7038480085);
         assert_eq!(deserialized_response.asks.len(), 10);
         assert_eq!(deserialized_response.bids.len(), 10);
