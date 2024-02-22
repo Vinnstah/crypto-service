@@ -1,6 +1,8 @@
 import CryptoServiceUniFFI
 
-public struct Client {}
+public struct Client {
+  public init() {}
+}
 
 extension Client {
     public func getSymbols(params: SymbolsParams) async -> [SymbolsResponse]  {
