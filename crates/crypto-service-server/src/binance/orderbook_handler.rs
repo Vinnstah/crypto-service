@@ -1,37 +1,12 @@
 use std::collections::HashMap;
 
-use crate::{
-    api_client::{api_client::ApiClient, get::QueryItems},
-    binance_service::{
-        binance_client::BinanceClient,
-        helpers::{OrderBook, OrderBookRequest, RecentTradesResponse},
-    },
-    coinapi_service::coinapi_client::CoinApiClient,
-    state::AppState,
-};
+use crate::{binance::binance_client::BinanceClient, state::AppState};
 use axum::extract::{self, Query};
+use crypto_service_uniffi::{binance_service::models::{OrderBook, OrderBookRequest, Params, RecentTradesResponse}, client_trait::QueryItems};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Debug, Deserialize, Serialize, uniffi::Record)]
-#[allow(dead_code)]
-pub struct Params {
-    pub symbol: String,
-    pub limit: Option<u16>,
-}
 
-impl QueryItems for Params {
-    type Query = String;
-
-    fn get_all_queries(&self) -> HashMap<&str, Self::Query> {
-        let mut hash = HashMap::new();
-        hash.insert("symbol", self.symbol.clone());
-        if self.limit.is_some() {
-            hash.insert("limit", self.limit.unwrap().to_string());
-        }
-        hash
-    }
-}
 
 #[axum::debug_handler]
 pub async fn get_order_book(
@@ -68,41 +43,8 @@ pub async fn get_recent_trades(
         .await
 }
 
-impl QueryItems for OrderBookRequest {
-    type Query = Value;
 
-    fn get_all_queries(&self) -> std::collections::HashMap<&str, Self::Query> {
-        let mut hash_map: HashMap<&str, Value> = HashMap::new();
-        if Value::is_string(&self.symbol) {
-            hash_map.insert("symbol", self.symbol.clone());
-        }
 
-        match &self.limit {
-            Some(Value::Number(limit)) => {
-                hash_map.insert("limit", serde_json::Value::Number(limit.clone()))
-            }
-            None => None,
-            _other => panic!("Failed"),
-        };
-        hash_map
-    }
-}
-
-#[uniffi::export]
-pub async fn get_orderbook_binding(params: Params, binance_key: String, coin_key: String) -> OrderBook {
-    let binance_client: BinanceClient = BinanceClient::new_with_api_key(binance_key);
-    let coinapi_client: CoinApiClient = CoinApiClient::new_with_api_key(coin_key);
-    let api_client = ApiClient::new();
-    let state = AppState::new(binance_client, coinapi_client, api_client);
-
-    get_order_book(
-        axum::extract::State(state),
-        Query::from(axum::extract::Query(params)),
-    )
-    .await
-    .map(|r| r.1 .0)
-    .expect("Failed to get Orderbook")
-}
 
 #[cfg(test)]
 mod tests {

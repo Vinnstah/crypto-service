@@ -1,5 +1,5 @@
-use crate::coinapi_service::coinapi_client::CoinApiClient;
-use crate::{api_client::api_client::ApiClient, binance_service::binance_client::BinanceClient};
+use crate::{api_client::api_client::ApiClient, binance::binance_client::BinanceClient, coin_api::coinapi_client::CoinApiClient};
+
 
 #[derive(Debug, Clone)]
 pub struct AppState {

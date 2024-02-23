@@ -1,6 +1,8 @@
 use core::fmt::Debug;
+use crypto_service_uniffi::client_trait::Client;
 use reqwest::header::{HeaderMap, ACCEPT};
 use std::env;
+
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinApiClient {
@@ -51,6 +53,16 @@ impl CoinApiClient {
             },
             base_url: "https://rest.coinapi.io/v1/".to_string(),
         }
+    }
+}
+
+impl Client for CoinApiClient {
+    fn get_base_url(&self) -> String {
+        self.base_url.clone()
+    }
+
+    fn get_headers(&self) -> HeaderMap {
+        self.headers.clone()
     }
 }
 //     async fn get<Request, Response>(

@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::api_client::get::QueryItems;
+use crate::client_trait::QueryItems;
+
 
 pub trait CoinAPIResponse {
     type Response;
