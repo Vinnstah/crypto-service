@@ -14,8 +14,6 @@ extension Client {
     }
 
     public func getOrderbook(params: Params) async -> OrderBook {
-      await getOrderbookBinding(params: params, binance_key: self.binanceKey, coin_key: self.coinApiKey) 
+      await getOrderbookBinding(params: params, binanceKey: self.binanceKey, coinKey: self.coinApiKey) 
     }
 }
-
-// Fix API-KEY for CoinApi since we instantiate both when creating the CLient for State. 
