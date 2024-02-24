@@ -1,4 +1,4 @@
-use crypto_service_uniffi::client_trait::Client;
+use crypto_service::client_trait::Client;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use std::env;
 

@@ -1,6 +1,6 @@
 use super::api_client::ApiClient;
 use axum::http::StatusCode;
-use crypto_service_uniffi::client_trait::{Client, QueryItems};
+use crypto_service::client_trait::{Client, QueryItems};
 use reqwest::{Request, Response};
 use serde::{de::DeserializeOwned, Serialize};
 use std::collections::HashMap;
@@ -84,7 +84,7 @@ impl ApiClient {
 mod tests {
     use std::{any::Any, str::FromStr};
 
-    use crypto_service_uniffi::binance_service::models::OrderBook;
+    use crypto_service::binance_service::models::OrderBook;
     use reqwest::Method;
     use serde::de::IntoDeserializer;
     use serde_json::Number;

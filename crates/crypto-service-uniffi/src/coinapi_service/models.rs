@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-
+use uniffi::Record;
 use crate::client_trait::QueryItems;
 
 

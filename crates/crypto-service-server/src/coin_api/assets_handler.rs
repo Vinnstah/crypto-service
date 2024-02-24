@@ -1,10 +1,9 @@
 use axum::extract::{self, Query, State};
-use crypto_service_uniffi::coinapi_service::models::{AssetIcons, AssetIconsParams, SymbolsParams, SymbolsResponse};
-
-use crate::{
-    state::AppState
+use crypto_service::coinapi_service::models::{
+    AssetIcons, AssetIconsParams, SymbolsParams, SymbolsResponse,
 };
 
+use crate::state::AppState;
 
 pub async fn get_asset_icons(
     State(state): extract::State<AppState>,
@@ -48,4 +47,3 @@ pub async fn get_symbols(
 //     .map(|x| x.1 .0)
 //     .unwrap()
 // }
-

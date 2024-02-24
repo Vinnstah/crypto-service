@@ -5,7 +5,7 @@ import PackageDescription
 
 let cryptoServiceBinaryTargetName = "CryptoServiceRS"
 let binaryTarget: Target
-let useLocalFramework = false
+let useLocalFramework = true
 
 if useLocalFramework {
 	binaryTarget = .binaryTarget(

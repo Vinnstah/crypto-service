@@ -1,8 +1,7 @@
 use core::fmt::Debug;
-use crypto_service_uniffi::client_trait::Client;
+use crypto_service::client_trait::Client;
 use reqwest::header::{HeaderMap, ACCEPT};
 use std::env;
-
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinApiClient {
