@@ -1,11 +1,10 @@
 use super::{
     api_client::ApiClient,
-    client_trait::{self, Client},
+    client_trait::Client,
 };
 use axum::http::StatusCode;
-use reqwest::{Request, Response};
+use reqwest::Request;
 use serde::{de::DeserializeOwned, Serialize};
-use std::collections::HashMap;
 
 impl ApiClient {
     pub async fn post<U, C: Client, R: Serialize>(
@@ -18,7 +17,6 @@ impl ApiClient {
         U: DeserializeOwned,
     {
         let request = self.counstruct_post_request(client_source, path, body)?;
-        println!("{:#?}", request.try_clone());
         let response_bytes = self.execute_request(request).await?;
         println!("{:#?}", response_bytes);
         self.deserialize_response::<U>(response_bytes).await

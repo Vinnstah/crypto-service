@@ -1,22 +1,38 @@
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListOfCoinsRequest {
     currency: String,
-    sort: String,
+    sort: Sort,
     order: String,
     offset: u8,
-    limit: u32, 
-    meta: bool
+    limit: u32,
+    meta: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum Sort {
+    Rank,
+    Price,
+    Volume,
+    Code,
+    Name,
+    Age,
 }
 
 impl ListOfCoinsRequest {
     pub fn new(limit: u32) -> Self {
-        Self { currency: "USD".into(), sort: "rank".into(), order: "descending".into(), offset: 0, limit: limit, meta: false }
+        Self {
+            currency: "USD".into(),
+            sort: Sort::Rank,
+            order: "descending".into(),
+            offset: 0,
+            limit: limit,
+            meta: false,
+        }
     }
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Coin {
@@ -39,12 +55,56 @@ pub struct Delta {
 
 impl Delta {
     pub fn new(hour: f64, day: f64, week: f64, month: f64, quarter: f64, year: f64) -> Self {
-        Self { hour, day, week, month, quarter, year }
+        Self {
+            hour,
+            day,
+            week,
+            month,
+            quarter,
+            year,
+        }
     }
 }
 
 impl Coin {
     pub fn new(code: String, rate: f64, volume: i64, cap: i64, delta: Delta) -> Self {
-        Self { code, rate, volume, cap, delta }
+        Self {
+            code,
+            rate,
+            volume,
+            cap,
+            delta,
+        }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CoinMetaRequest {
+    pub currency: String,
+    pub code: String,
+    pub meta: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CoinMeta {
+    pub name: String,
+    pub symbol: String,
+    pub rank: i64,
+    pub age: i64,
+    pub color: String,
+    pub png32: String,
+    pub png64: String,
+    pub webp32: String,
+    pub webp64: String,
+    #[serde(rename = "allTimeHighUSD")]
+    pub all_time_high_usd: f64,
+    pub links: Links,
+    pub delta: Delta,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Links {
+    pub website: Option<String>,
+    pub whitepaper: Option<String>,
 }

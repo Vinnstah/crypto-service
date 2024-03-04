@@ -31,6 +31,7 @@ async fn main() -> Result<()> {
         .route("/v1/symbols/icons", get(assets_handler::get_asset_icons))
         .route("/v1/symbols", get(assets_handler::get_symbols))
         .route("/v1/coins/list", post(coin_watch_handlers::get_list_of_coins))
+        .route("/v1/coins/single", post(coin_watch_handlers::get_coin_meta_info))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
