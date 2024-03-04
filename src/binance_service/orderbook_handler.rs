@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    api_client::{api_client::ApiClient, get::QueryItems},
+    api_client::{api_client::ApiClient, client_trait::EmptyBody, get::QueryItems},
     binance_service::{
         binance_client::BinanceClient,
         helpers::{OrderBook, OrderBookRequest, RecentTradesResponse},
@@ -43,7 +43,7 @@ pub async fn get_order_book(
 > {
     state
         .api_client
-        .get::<Params, OrderBook, BinanceClient>(state.binance_client, "depth", params)
+        .get::<Params, OrderBook, BinanceClient, EmptyBody>(state.binance_client, "depth", params, None)
         .await
 }
 
@@ -60,10 +60,11 @@ pub async fn get_recent_trades(
 > {
     state
         .api_client
-        .get::<Params, Vec<RecentTradesResponse>, BinanceClient>(
+        .get::<Params, Vec<RecentTradesResponse>, BinanceClient, EmptyBody>(
             state.binance_client,
             "trades",
             params,
+            None
         )
         .await
 }
@@ -88,21 +89,21 @@ impl QueryItems for OrderBookRequest {
     }
 }
 
-#[uniffi::export]
-pub async fn get_orderbook_binding(params: Params, binance_key: String, coin_key: String) -> OrderBook {
-    let binance_client: BinanceClient = BinanceClient::new_with_api_key(binance_key);
-    let coinapi_client: CoinApiClient = CoinApiClient::new_with_api_key(coin_key);
-    let api_client = ApiClient::new();
-    let state = AppState::new(binance_client, coinapi_client, api_client);
+// #[uniffi::export]
+// pub async fn get_orderbook_binding(params: Params, binance_key: String, coin_key: String) -> OrderBook {
+//     let binance_client: BinanceClient = BinanceClient::new_with_api_key(binance_key);
+//     let coinapi_client: CoinApiClient = CoinApiClient::new_with_api_key(coin_key);
+//     let api_client = ApiClient::new();
+//     let state = AppState::new(binance_client, coinapi_client, api_client);
 
-    get_order_book(
-        axum::extract::State(state),
-        Query::from(axum::extract::Query(params)),
-    )
-    .await
-    .map(|r| r.1 .0)
-    .expect("Failed to get Orderbook")
-}
+//     get_order_book(
+//         axum::extract::State(state),
+//         Query::from(axum::extract::Query(params)),
+//     )
+//     .await
+//     .map(|r| r.1 .0)
+//     .expect("Failed to get Orderbook")
+// }
 
 #[cfg(test)]
 mod tests {

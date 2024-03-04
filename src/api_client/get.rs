@@ -1,29 +1,33 @@
-use super::{api_client::ApiClient, client_trait::Client};
+use super::{
+    api_client::ApiClient,
+    client_trait::{self, Client},
+};
 use axum::http::StatusCode;
 use reqwest::{Request, Response};
 use serde::{de::DeserializeOwned, Serialize};
 use std::collections::HashMap;
 
 impl ApiClient {
-    pub async fn get<T, U, C: Client>(
+    pub async fn get<T, U, C: Client, R: Serialize>(
         &self,
         client_source: C,
         path: &str,
         query: T,
+        body: Option<R>,
     ) -> Result<(StatusCode, axum::Json<U>), (StatusCode, axum::Json<String>)>
     where
         <T as QueryItems>::Query: Serialize,
         T: QueryItems + std::fmt::Debug + Serialize,
         U: DeserializeOwned,
     {
-        let request = self.counstruct_request(client_source, path, query)?;
+        let request = self.counstruct_request(client_source, path, query, body)?;
 
         let response_bytes = self.execute_request(request).await?;
 
         self.deserialize_response(response_bytes).await
     }
 
-    async fn deserialize_response<U: DeserializeOwned>(
+    pub async fn deserialize_response<U: DeserializeOwned>(
         &self,
         response_bytes: Response,
     ) -> Result<(StatusCode, axum::Json<U>), (StatusCode, axum::Json<String>)> {
@@ -34,7 +38,7 @@ impl ApiClient {
             .map(|r| (StatusCode::OK, axum::Json::<U>(r)))
     }
 
-    async fn execute_request(
+    pub async fn execute_request(
         &self,
         request: Request,
     ) -> Result<Response, (StatusCode, axum::Json<String>)> {
@@ -45,11 +49,12 @@ impl ApiClient {
             .map_err(|e| (StatusCode::BAD_REQUEST, axum::Json(e.to_string())))
     }
 
-    fn counstruct_request<T, C: Client>(
+    fn counstruct_request<T, C: Client, R: Serialize>(
         &self,
         client_source: C,
         path: &str,
         query: T,
+        body: Option<R>,
     ) -> Result<Request, (StatusCode, axum::Json<String>)>
     where
         <T as QueryItems>::Query: Serialize,
@@ -60,6 +65,7 @@ impl ApiClient {
 
         self.http_client
             .get(url)
+            .json(&body)
             .headers(client_source.get_headers())
             .query(&query)
             .build()

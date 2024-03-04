@@ -1,13 +1,11 @@
 use anyhow::Result;
-use axum::{routing::get, Router};
+use axum::{routing::{get, post}, Router};
 
 use crypto_service::{
     api_client::api_client::ApiClient,
     binance_service::{binance_client::BinanceClient, orderbook_handler},
-    coinapi_service::{
-        assets_handler::{self},
-        coinapi_client::CoinApiClient,
-    },
+    coin_watch_service::{coin_watch_client::CoinWatchClient, coin_watch_handlers},
+    coinapi_service::{assets_handler, coinapi_client::CoinApiClient},
     state::AppState,
 };
 
@@ -17,15 +15,22 @@ async fn main() -> Result<()> {
 
     let binance_client: BinanceClient = BinanceClient::new();
     let coinapi_client: CoinApiClient = CoinApiClient::new();
+    let coin_watch_client = CoinWatchClient::new();
     let api_client = ApiClient::new();
 
-    let state = AppState::new(binance_client, coinapi_client, api_client);
+    let state = AppState::new(
+        binance_client,
+        coinapi_client,
+        coin_watch_client,
+        api_client,
+    );
 
     let app = Router::new()
         .route("/v1/orderbooks", get(orderbook_handler::get_order_book))
         .route("/v1/trades", get(orderbook_handler::get_recent_trades))
         .route("/v1/symbols/icons", get(assets_handler::get_asset_icons))
         .route("/v1/symbols", get(assets_handler::get_symbols))
+        .route("/v1/coins/list", post(coin_watch_handlers::get_list_of_coins))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();

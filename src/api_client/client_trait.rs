@@ -2,7 +2,13 @@ use crate::{
     binance_service::binance_client::BinanceClient, coinapi_service::coinapi_client::CoinApiClient,
 };
 use core::fmt::Debug;
+use std::collections::HashMap;
+use axum::Json;
 use reqwest::header::HeaderMap;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
+
+use super::get::QueryItems;
 
 pub trait Client: Debug {
     fn get_base_url(&self) -> String;
@@ -15,6 +21,17 @@ impl Client for BinanceClient {
     }
     fn get_headers(&self) -> HeaderMap {
         self.headers.clone()
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct EmptyBody {}
+
+impl QueryItems for EmptyBody {
+    type Query = Self;
+
+    fn get_all_queries(&self) -> std::collections::HashMap<&str, Self::Query> {
+        HashMap::new()
     }
 }
 

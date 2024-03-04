@@ -1,7 +1,7 @@
 use axum::extract::{self, Query, State};
 
 use crate::{
-    api_client::api_client::ApiClient, binance_service::binance_client::BinanceClient, coinapi_service::helpers::{AssetIcons, SymbolsResponse}, state::AppState
+    api_client::{api_client::ApiClient, client_trait::EmptyBody}, binance_service::binance_client::BinanceClient, coin_watch_service::models::Coin, coinapi_service::helpers::{AssetIcons, SymbolsResponse}, state::AppState
 };
 
 use super::{coinapi_client::CoinApiClient, helpers::{AssetIconsParams, SymbolsParams}};
@@ -15,7 +15,7 @@ pub async fn get_asset_icons(
 > {
     state
         .api_client
-        .get(state.coinapi_client, "assets/icons/", params)
+        .get::<AssetIconsParams, Vec<AssetIcons>, CoinApiClient, EmptyBody>(state.coinapi_client, "assets/icons/", params, None)
         .await
 }
 
@@ -28,24 +28,24 @@ pub async fn get_symbols(
 > {
     state
         .api_client
-        .get(state.coinapi_client, "symbols", params)
+        .get::<SymbolsParams, Vec<SymbolsResponse>, CoinApiClient, EmptyBody>(state.coinapi_client, "symbols", params, None)
         .await
 }
 
-#[uniffi::export]
-pub async fn get_symbols_binding(params: SymbolsParams) -> Vec<SymbolsResponse> {
-    let binance_client: BinanceClient = BinanceClient::new();
-    let coinapi_client: CoinApiClient = CoinApiClient::new();
-    let api_client = ApiClient::new();
+// #[uniffi::export]
+// pub async fn get_symbols_binding(params: SymbolsParams) -> Vec<SymbolsResponse> {
+//     let binance_client: BinanceClient = BinanceClient::new();
+//     let coinapi_client: CoinApiClient = CoinApiClient::new();
+//     let api_client = ApiClient::new();
 
-    let state = AppState::new(binance_client, coinapi_client, api_client);
+//     let state = AppState::new(binance_client, coinapi_client, api_client);
 
-    get_symbols(
-        axum::extract::State(state),
-        Query::from(axum::extract::Query(params)),
-    )
-    .await
-    .map(|x| x.1 .0)
-    .unwrap()
-}
+//     get_symbols(
+//         axum::extract::State(state),
+//         Query::from(axum::extract::Query(params)),
+//     )
+//     .await
+//     .map(|x| x.1 .0)
+//     .unwrap()
+// }
 
