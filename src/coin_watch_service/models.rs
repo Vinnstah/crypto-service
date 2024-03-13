@@ -26,7 +26,7 @@ impl ListOfCoinsRequest {
         Self {
             currency: "USD".into(),
             sort: Sort::Rank,
-            order: "descending".into(),
+            order: "ascending".into(),
             offset: 0,
             limit: limit,
             meta: false,
@@ -85,6 +85,12 @@ pub struct CoinMetaRequest {
     pub meta: bool,
 }
 
+impl CoinMetaRequest {
+    pub fn new(code: String) -> Self {
+        Self { currency: "USD".into(), code, meta: true }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CoinMeta {
@@ -107,4 +113,20 @@ pub struct CoinMeta {
 pub struct Links {
     pub website: Option<String>,
     pub whitepaper: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct AggregatedCoinInformation {
+    pub name: String,
+    pub symbol: String,
+    pub rank: i64,
+    pub rate: f64,
+    pub color: String,
+    pub png64: String
+}
+
+impl AggregatedCoinInformation {
+    pub fn new(name: String, symbol: String, rank: i64, rate: f64) -> Self {
+        Self { name, symbol, rank, rate, color: "".into(), png64: "".into() }
+    }
 }
