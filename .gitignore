@@ -5,3 +5,4 @@ Cargo.lock
 tarpaulin-report.html
 .vscode
 apple/Sources/UniFFI/crypto_service.swift
+.build/*
