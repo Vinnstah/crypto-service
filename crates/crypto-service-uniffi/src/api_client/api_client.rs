@@ -38,6 +38,7 @@ pub enum Response {
     Symbols { symbolls: SymbolsResponse },
 }
 
+
 pub fn request(
     network_antenna: Box<dyn NetworkAntenna>,
     request: RequestCases,
@@ -58,8 +59,10 @@ pub fn request(
 //     }
 // }
 
-#[derive(uniffi::Error)]
-pub enum DataTaskFailure {}
+#[derive(Debug, uniffi::Error)]
+pub enum DataTaskFailure {
+    Error
+}
 
 #[derive(uniffi::Record)]
 pub struct Data {}

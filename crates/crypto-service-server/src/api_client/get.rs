@@ -24,7 +24,7 @@ impl ApiClient {
         self.deserialize_response(response_bytes).await
     }
 
-    async fn deserialize_response<U: DeserializeOwned>(
+    pub async fn deserialize_response<U: DeserializeOwned>(
         &self,
         response_bytes: Response,
     ) -> Result<(StatusCode, axum::Json<U>), (StatusCode, axum::Json<String>)> {
@@ -35,7 +35,7 @@ impl ApiClient {
             .map(|r| (StatusCode::OK, axum::Json::<U>(r)))
     }
 
-    async fn execute_request(
+    pub async fn execute_request(
         &self,
         request: Request,
     ) -> Result<Response, (StatusCode, axum::Json<String>)> {
