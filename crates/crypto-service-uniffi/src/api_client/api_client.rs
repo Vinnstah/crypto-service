@@ -12,40 +12,33 @@ use crate::{
     coinapi_service::models::SymbolsResponse,
 };
 
-/// protocol NetworkManager {
-///     func install(self) -> some RequestHandler   
-/// }
-///
-/// struct Coordinator: NetworkManager {
-///     func install(self) -> some RequestHandler {
-///         ApiClient(client: .....)
-///
-
-#[uniffi::export(callback_interface)]
-pub trait NetworkAntenna: Send + Sync {
-    fn send(&self, request: RequestCases) -> Result<Response, DataTaskFailure>;
-}
-
-#[derive(uniffi::Enum)]
-pub enum RequestCases {
-    Orderbook { orderbook: OrderBook },
-    Symbols { symbolls: SymbolsResponse },
-}
-
-#[derive(uniffi::Enum)]
-pub enum Response {
-    Orderbook { orderbook: OrderBook },
-    Symbols { symbolls: SymbolsResponse },
-}
 
 
-pub fn request(
-    network_antenna: Box<dyn NetworkAntenna>,
-    request: RequestCases,
-) -> Result<Response, DataTaskFailure> {
+// #[uniffi::export(callback_interface)]
+// pub trait NetworkAntenna: Send + Sync {
+//     fn send(&self, request: RequestCases) -> Result<Response, DataTaskFailure>;
+// }
 
-    network_antenna.send(request)
-}
+// #[derive(uniffi::Enum)]
+// pub enum RequestCases {
+//     Orderbook { orderbook: OrderBook },
+//     Symbols { symbolls: SymbolsResponse },
+// }
+
+// #[derive(uniffi::Enum)]
+// pub enum Response {
+//     Orderbook { orderbook: OrderBook },
+//     Symbols { symbolls: SymbolsResponse },
+// }
+
+
+// pub fn request(
+//     network_antenna: Box<dyn NetworkAntenna>,
+//     request: RequestCases,
+// ) -> Result<Response, DataTaskFailure> {
+
+//     network_antenna.send(request)
+// }
 
 // #[derive(uniffi::Record)]
 // pub struct ApiClient {
@@ -59,16 +52,16 @@ pub fn request(
 //     }
 // }
 
-#[derive(Debug, uniffi::Error)]
-pub enum DataTaskFailure {
-    Error
-}
+// #[derive(Debug, uniffi::Error)]
+// pub enum DataTaskFailure {
+//     Error
+// }
 
-#[derive(uniffi::Record)]
-pub struct Data {}
+// #[derive(uniffi::Record)]
+// pub struct Data {}
 
-#[derive(uniffi::Record)]
-pub struct URLRequest {}
+// #[derive(uniffi::Record)]
+// pub struct URLRequest {}
 
 // #[uniffi::export]
 // impl ApiClient {
