@@ -95,7 +95,7 @@ impl CoinMetaRequest {
 #[serde(rename_all = "camelCase")]
 pub struct CoinMeta {
     pub name: String,
-    pub symbol: String,
+    pub symbol: Option<String>,
     pub rank: i64,
     pub age: i64,
     pub color: String,

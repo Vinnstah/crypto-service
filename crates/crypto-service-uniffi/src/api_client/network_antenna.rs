@@ -1,7 +1,7 @@
 
 use std::{collections::HashMap, sync::{Arc, Mutex}};
 use tokio::sync::oneshot::Sender;
-use uniffi::{Enum, Object, Record};
+use uniffi::{export, Enum, Object, Record};
 
 pub trait NetworkAntenna {}
 
@@ -101,7 +101,6 @@ pub trait IsOutcomeListener: From<FFIOperationOutcomeListener<Self::Outcome>> {
     type Failure: Into<UniffiError>;
     type Outcome: Into<Result<Self::Response, Self::Failure>>;
 }
-
 #[derive(Object)]
 pub struct FFINetworkingOutcomeListener {
     result_listener: FFIOperationOutcomeListener<FFINetworkingOutcome>,
@@ -126,6 +125,7 @@ impl FFINetworkingOutcomeListener {
     }
 }
 
+#[export]
 impl FFINetworkingOutcomeListener {
     fn notify_outcome(&self, result: FFINetworkingOutcome) {
         self.result_listener.notify_outcome(result.into())
