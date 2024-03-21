@@ -7,9 +7,9 @@ use crate::client_trait::QueryItems;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
 pub struct OrderBook {
-    pub asks: Vec<Order>,
-    pub bids: Vec<Order>,
-    
+    pub asks: Vec<Vec<String>>,
+    pub bids: Vec<Vec<String>>,
+
     #[serde(rename = "lastUpdateId")]
     pub last_update_id: u64,
 }
@@ -20,28 +20,16 @@ impl Default for OrderBook {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Debug, uniffi::Record)]
-pub struct Order {
-    pub price: Vec<String>,
-    pub amount: Vec<String>
-}
-
-impl Order {
-    pub fn new() -> Self {
-        Self { price: vec![String::new()], amount: vec![String::new()] }
-    }
-}
-
 impl OrderBook {
     pub fn new() -> Self {
         Self {
-            asks: vec![Order::new()],
-            bids: vec![Order::new()],
+            asks: vec![vec![String::new()]],
+            bids: vec![vec![String::new()]],
             last_update_id: 0,
         }
     }
 
-    pub fn from(asks: Vec<Order>, bids: Vec<Order>, last_update_id: u64) -> Self {
+    pub fn from(asks: Vec<Vec<String>>, bids: Vec<Vec<String>>, last_update_id: u64) -> Self {
         Self {
             asks,
             bids,
