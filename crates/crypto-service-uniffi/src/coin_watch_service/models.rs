@@ -11,6 +11,15 @@ pub struct ListOfCoinsRequest {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CoinHistoryRequest {
+    currency: String,
+    code: String,
+    start: u64,
+    end: u64,
+    meta: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum Sort {
     Rank,
@@ -94,6 +103,7 @@ impl CoinMetaRequest {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CoinMeta {
+    pub code: Option<String>,
     pub name: String,
     pub symbol: Option<String>,
     pub rank: i64,
@@ -106,7 +116,16 @@ pub struct CoinMeta {
     #[serde(rename = "allTimeHighUSD")]
     pub all_time_high_usd: f64,
     pub links: Links,
-    pub delta: Delta,
+    pub delta: Option<Delta>,
+    pub history: Option<Vec<History>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct History {
+    pub date: i64,
+    pub rate: f64,
+    pub volume: i64,
+    pub cap: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

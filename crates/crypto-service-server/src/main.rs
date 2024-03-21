@@ -25,6 +25,7 @@ async fn main() -> Result<()> {
         .route("/v1/symbols", get(assets_handler::get_symbols))
         .route("/v1/coins/list", post(coin_watch_handlers::get_list_of_coins))
         .route("/v1/coins/single", post(coin_watch_handlers::get_coin_meta_info))
+        .route("/v1/coins/single/history", post(coin_watch_handlers::get_coin_history_info))
         .route("/v1/coins/list/aggregated", post(coin_watch_handlers::get_aggregated_coin_list))
         .with_state(state);
 
