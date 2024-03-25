@@ -1,4 +1,0 @@
-module CryptoServiceUniFFI {
-    header "/Users/viktorjansson/Developer/Rust/crypto_service/.build/x86_64-apple-macosx/debug/CryptoServiceUniFFI.build/CryptoServiceUniFFI-Swift.h"
-    requires objc
-}

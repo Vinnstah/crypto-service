@@ -1,4 +1,0 @@
-module CryptoService {
-    header "/Users/viktorjansson/Developer/Rust/crypto_service/.build/x86_64-apple-macosx/debug/CryptoService.build/CryptoService-Swift.h"
-    requires objc
-}
