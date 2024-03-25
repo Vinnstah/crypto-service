@@ -1,3 +1,4 @@
+use crypto_service::client_trait::Client;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use std::env;
 
@@ -47,6 +48,15 @@ impl BinanceClient {
             },
             base_url: "https://api.binance.com/api/v3/".to_string(),
         }
+    }
+}
+
+impl Client for BinanceClient {
+    fn get_base_url(&self) -> String {
+        self.base_url.clone()
+    }
+    fn get_headers(&self) -> HeaderMap {
+        self.headers.clone()
     }
 }
 
