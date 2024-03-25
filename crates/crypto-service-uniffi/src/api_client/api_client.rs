@@ -9,7 +9,6 @@ use uniffi::{check_remaining, metadata, Lift, Lower, LowerReturn, MetadataBuffer
 
 use crate::{
     binance_service::models::OrderBook, client_trait::QueryItems,
-    coinapi_service::models::SymbolsResponse,
 };
 
 

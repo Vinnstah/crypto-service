@@ -1,10 +1,10 @@
-use crate::{api_client::api_client::ApiClient, binance::binance_client::BinanceClient, coin_api::coinapi_client::CoinApiClient, coin_watch::coin_watch_client::CoinWatchClient};
+use crate::{alphavantage_api::alpha_client::{AlphaAdvantageClient}, api_client::api_client::ApiClient, binance::binance_client::BinanceClient, coin_watch::coin_watch_client::CoinWatchClient};
 
 
 #[derive(Debug, Clone)]
 pub struct AppState {
     pub binance_client: BinanceClient,
-    pub coinapi_client: CoinApiClient,
+    pub alpha_client: AlphaAdvantageClient,
     pub coin_watch_client: CoinWatchClient,
     pub api_client: ApiClient,
 }
@@ -12,13 +12,13 @@ pub struct AppState {
 impl AppState {
     pub fn new(
         binance_client: BinanceClient,
-        coinapi_client: CoinApiClient,
+        alpha_client: AlphaAdvantageClient,
         coin_watch_client: CoinWatchClient,
         api_client: ApiClient,
     ) -> Self {
         Self {
             binance_client,
-            coinapi_client,
+            alpha_client,
             coin_watch_client,
             api_client,
         }

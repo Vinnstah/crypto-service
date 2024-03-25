@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use uniffi::{Record, Enum};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Record)]
 pub struct ListOfCoinsRequest {
     currency: String,
     sort: Sort,
@@ -10,7 +11,7 @@ pub struct ListOfCoinsRequest {
     meta: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Record)]
 pub struct CoinHistoryRequest {
     currency: String,
     code: String,
@@ -19,7 +20,7 @@ pub struct CoinHistoryRequest {
     meta: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Enum)]
 #[serde(rename_all = "lowercase")]
 pub enum Sort {
     Rank,
@@ -43,7 +44,7 @@ impl ListOfCoinsRequest {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Record)]
 pub struct Coin {
     pub code: String,
     pub rate: f64,
@@ -52,7 +53,7 @@ pub struct Coin {
     pub delta: Delta,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Record)]
 pub struct Delta {
     pub hour: f64,
     pub day: f64,
@@ -87,7 +88,7 @@ impl Coin {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Record)]
 pub struct CoinMetaRequest {
     pub currency: String,
     pub code: String,
@@ -100,7 +101,7 @@ impl CoinMetaRequest {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Record)]
 #[serde(rename_all = "camelCase")]
 pub struct CoinMeta {
     pub code: Option<String>,
@@ -120,7 +121,7 @@ pub struct CoinMeta {
     pub history: Option<Vec<History>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Record)]
 pub struct History {
     pub date: i64,
     pub rate: f64,
@@ -128,13 +129,13 @@ pub struct History {
     pub cap: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Record)]
 pub struct Links {
     pub website: Option<String>,
     pub whitepaper: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Record)]
 pub struct AggregatedCoinInformation {
     pub name: String,
     pub symbol: String,
