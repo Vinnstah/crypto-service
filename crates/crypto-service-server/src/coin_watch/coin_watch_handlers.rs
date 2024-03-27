@@ -4,7 +4,8 @@ use super::coin_watch_client::CoinWatchClient;
 use crate::state::AppState;
 use axum::{extract::State, http::StatusCode, Json};
 use crypto_service::coin_watch_service::models::{
-    AggregatedCoinInformation, Coin, CoinHistoryRequest, CoinMeta, CoinMetaRequest, ListOfCoinsRequest
+    AggregatedCoinInformation, Coin, CoinHistoryRequest, CoinMeta, CoinMetaRequest,
+    ListOfCoinsRequest,
 };
 use serde::{de::IntoDeserializer, Serialize};
 
@@ -71,7 +72,7 @@ pub async fn get_aggregated_coin_list(
         .expect("Failed to receive result");
 
     let mut coin_meta: Vec<CoinMeta> = vec![];
-    for coin in &list_of_coins.1.0 {
+    for coin in &list_of_coins.1 .0 {
         let coin_body = CoinMetaRequest::new(coin.code.clone());
         coin_meta.push(
             state
@@ -82,7 +83,7 @@ pub async fn get_aggregated_coin_list(
                     coin_body,
                 )
                 .await
-                .map(|x| x.1.0)
+                .map(|x| x.1 .0)
                 .unwrap(),
         );
     }
