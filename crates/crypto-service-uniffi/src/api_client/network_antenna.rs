@@ -12,7 +12,6 @@ use crate::coin_watch_service::models::{AggregatedCoinInformation, ListOfCoinsRe
 use super::error::{FFIBridgeError, FFINetworkingError, FFISideError, RustSideError};
 // use super::error::{FFIBridgeError, RustSideError};
 
-// #[derive(Object)]
 #[derive(Object)]
 pub struct Gateway {
     pub networking_dispatcher: FFIOperationDispatcher<FFINetworkingOutcomeListener>,

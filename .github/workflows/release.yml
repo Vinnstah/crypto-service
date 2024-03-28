@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: macos-14
     env:
-      RUST_TOOLCHAIN: nightly-2024-01-11
+      RUST_TOOLCHAIN: nightly-2024-01-19
       RUST_COMPONENTS: "rust-std"
     steps:
       - uses: actions/checkout@main
