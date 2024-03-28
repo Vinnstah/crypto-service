@@ -1,5 +1,5 @@
-use std::sync::Arc;
-use crate::client_trait::Client;
+#![feature(trait_upcasting)]
+
 pub mod binance_service;
 pub mod alphavantage_service;
 pub mod client_trait;
