@@ -1,13 +1,9 @@
-use std::collections::HashMap;
 
 use crate::{binance::binance_client::BinanceClient, state::AppState};
 use axum::extract::{self, Query};
 use crypto_service::{
-    binance_service::models::{OrderBook, OrderBookRequest, Params, RecentTradesResponse},
-    client_trait::QueryItems,
+    binance_service::models::{OrderBook, Params, RecentTradesResponse},
 };
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 #[axum::debug_handler]
 pub async fn get_order_book(

@@ -1,4 +1,3 @@
-use std::result;
 
 use super::coin_watch_client::CoinWatchClient;
 use crate::state::AppState;
@@ -7,9 +6,7 @@ use crypto_service::coin_watch_service::models::{
     AggregatedCoinInformation, Coin, CoinHistoryRequest, CoinMeta, CoinMetaRequest,
     ListOfCoinsRequest,
 };
-use serde::{de::IntoDeserializer, Serialize};
 
-#[axum::debug_handler]
 pub async fn get_list_of_coins(
     State(state): State<AppState>,
     Json(body): Json<ListOfCoinsRequest>,
@@ -24,7 +21,6 @@ pub async fn get_list_of_coins(
         .await
 }
 
-#[axum::debug_handler]
 pub async fn get_coin_meta_info(
     State(state): State<AppState>,
     Json(body): Json<CoinMetaRequest>,
@@ -39,7 +35,6 @@ pub async fn get_coin_meta_info(
         .await
 }
 
-#[axum::debug_handler]
 pub async fn get_coin_history_info(
     State(state): State<AppState>,
     Json(body): Json<CoinHistoryRequest>,
@@ -54,7 +49,6 @@ pub async fn get_coin_history_info(
         .await
 }
 
-#[axum::debug_handler]
 pub async fn get_aggregated_coin_list(
     State(state): State<AppState>,
     Json(body): Json<ListOfCoinsRequest>,
@@ -92,11 +86,11 @@ pub async fn get_aggregated_coin_list(
         list_of_aggregated_coins.push(AggregatedCoinInformation {
             name: coin_meta[idx].name.clone(),
             symbol: coin_meta[idx].symbol.clone().unwrap_or("0".to_string()),
-            rank: coin_meta[idx].rank.clone(),
+            rank: coin_meta[idx].rank,
             rate: coin.rate,
             color: coin_meta[idx].color.clone(),
             png64: coin_meta[idx].png64.clone(),
         })
     }
-    return Ok(axum::Json(list_of_aggregated_coins));
+    Ok(axum::Json(list_of_aggregated_coins))
 }

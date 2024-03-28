@@ -1,11 +1,16 @@
 use core::fmt::Debug;
 use crypto_service::client_trait::Client;
-use reqwest::header::{HeaderMap, ACCEPT};
-use std::env;
+use reqwest::header::{HeaderMap};
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct AlphaAdvantageClient {
     pub base_url: String,
+}
+
+impl Default for AlphaAdvantageClient {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl AlphaAdvantageClient {

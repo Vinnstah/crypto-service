@@ -54,7 +54,7 @@ mod tests {
 
         let test_client = TestClient {
             base_url: String::new(),
-            headers: headers,
+            headers,
         };
 
         assert!(test_client.get_headers().contains_key("apa"));

@@ -3,7 +3,6 @@ use axum::http::StatusCode;
 use crypto_service::client_trait::{Client, QueryItems};
 use reqwest::{Request, Response};
 use serde::{de::DeserializeOwned, Serialize};
-use std::collections::HashMap;
 
 impl ApiClient {
     pub async fn get<T, U, C: Client>(
@@ -82,14 +81,14 @@ impl ApiClient {
 
 #[cfg(test)]
 mod tests {
-    use std::{any::Any, str::FromStr};
+    
 
     use crypto_service::binance_service::models::OrderBook;
-    use reqwest::Method;
-    use serde::de::IntoDeserializer;
-    use serde_json::Number;
+    
+    
+    
 
-    use super::*;
+    
 
     // #[test]
     // fn construct_request() {

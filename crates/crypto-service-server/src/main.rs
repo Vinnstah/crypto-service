@@ -1,6 +1,6 @@
 use anyhow::Result;
 use axum::{routing::{get, post}, Router};
-use crypto_service_server::{alphavantage_api::{alpha_handler, alpha_client::{AlphaAdvantageClient}}, api_client::{api_client::ApiClient, post}, binance::{binance_client::BinanceClient, orderbook_handler}, coin_watch::{coin_watch_client::CoinWatchClient, coin_watch_handlers}, state::AppState};
+use crypto_service_server::{alphavantage_api::{alpha_handler, alpha_client::{AlphaAdvantageClient}}, api_client::{api_client::ApiClient}, binance::{binance_client::BinanceClient, orderbook_handler}, coin_watch::{coin_watch_client::CoinWatchClient, coin_watch_handlers}, state::AppState};
 
 #[tokio::main]
 async fn main() -> Result<()> {

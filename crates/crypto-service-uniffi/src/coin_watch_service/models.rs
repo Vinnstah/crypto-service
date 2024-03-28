@@ -38,7 +38,7 @@ impl ListOfCoinsRequest {
             sort: Sort::Rank,
             order: "ascending".into(),
             offset: 0,
-            limit: limit,
+            limit,
             meta: false,
         }
     }
