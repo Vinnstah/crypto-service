@@ -17,9 +17,3 @@
 //       await getOrderbookBinding(params: params, binanceKey: self.binanceKey, coinKey: self.coinApiKey) 
 //     }
 // }
-
-public extension AggregatedCoinInformation: Codable {}
-public extension ListOfCoinsRequest: Codable {}
-public extension CoinHistoryRequest: Codable {}
-public extension CoinMeta: Codable {}
-public extension Coin: Codable {}
