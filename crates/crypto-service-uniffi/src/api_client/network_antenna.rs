@@ -25,27 +25,28 @@ pub struct CoinWatchExternalClient {
 
 impl Default for CoinWatchExternalClient {
     fn default() -> Self {
-        Self::new()
+        Self::new("Test".to_string())
     }
 }
 
 impl CoinWatchExternalClient {
-    pub fn new() -> Self {
+    pub fn new(key: String) -> Self {
         Self {
             headers: {
                 let mut headers: HashMap<String, String> = HashMap::new();
                 headers.insert(
                     "x-api-key".to_string(),
-                    env::var("LIVE_COIN_WATCH_API_KEY")
-                        .expect("No API-key found for Coin Watch")
-                        .parse()
-                        .expect("Failed to parse header for Coin Watch"),
+                    key
+                    // env::var("LIVE_COIN_WATCH_API_KEY")
+                    //     .expect("No API-key found for Coin Watch")
+                    //     .parse()
+                    //     .expect("Failed to parse header for Coin Watch"),
                 );
                 headers.insert(
                     "ACCEPT".to_string(),
                     "application/json"
                         .parse()
-                        .to_owned()
+                        .to_string()
                         .expect("Failed to parse header for Coin Watch")
                         ,
                 );
@@ -113,12 +114,12 @@ impl Gateway {
 
     pub async fn get_list_of_agg_coins(
         &self,
-        address: String,
+        key: String
     ) -> Result<
         Vec<AggregatedCoinInformation>,
         FFIBridgeError,
     > {
-        let external_client = CoinWatchExternalClient::new();
+        let external_client = CoinWatchExternalClient::new(key);
 
         self.post(
             "/coins/list",

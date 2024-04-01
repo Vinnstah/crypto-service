@@ -22,8 +22,6 @@ async fn main() -> Result<()> {
         .route("/v1/orderbooks", get(orderbook_handler::get_order_book))
         .route("/v1/trades", get(orderbook_handler::get_recent_trades))
         .route("/v1/stocks", get(alpha_handler::get_top_gainers_and_losers))
-        // .route("/v1/symbols/icons", get(assets_handler::get_asset_icons))
-        // .route("/v1/symbols", get(assets_handler::get_symbols))
         .route("/v1/coins/list", post(coin_watch_handlers::get_list_of_coins))
         .route("/v1/coins/single", post(coin_watch_handlers::get_coin_meta_info))
         .route("/v1/coins/single/history", post(coin_watch_handlers::get_coin_history_info))
