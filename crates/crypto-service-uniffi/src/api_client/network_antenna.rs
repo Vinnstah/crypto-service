@@ -1,20 +1,76 @@
-use std::sync::Arc;
-
-use serde::{Deserialize, Serialize};
-use serde_json::to_vec;
-use std::convert::identity;
-use std::{collections::HashMap, sync::Mutex};
-use tokio::sync::oneshot::{channel, Sender};
-use uniffi::{export, Enum, Object, Record};
-
 use crate::coin_watch_service::models::{
     AggregatedCoinInformation, ListOfCoinsRequest,
 };
+use reqwest::header::{HeaderMap, ACCEPT};
+use serde::{Deserialize, Serialize};
+use serde_json::to_vec;
+use std::convert::identity;
+use std::env;
+use std::fmt::Debug;
+use std::sync::Arc;
+use std::{collections::HashMap, sync::Mutex};
+use tokio::sync::oneshot::{channel, Sender};
+use uniffi::{export, Enum, Object, Record};
 
 use super::error::{
     FFIBridgeError, FFINetworkingError, FFISideError,
     RustSideError,
 };
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct CoinWatchExternalClient {
+    pub headers: HashMap<String, String>,
+    pub base_url: String,
+}
+
+impl Default for CoinWatchExternalClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CoinWatchExternalClient {
+    pub fn new() -> Self {
+        Self {
+            headers: {
+                let mut headers: HashMap<String, String> = HashMap::new();
+                headers.insert(
+                    "x-api-key".to_string(),
+                    env::var("LIVE_COIN_WATCH_API_KEY")
+                        .expect("No API-key found for Coin Watch")
+                        .parse()
+                        .expect("Failed to parse header for Coin Watch"),
+                );
+                headers.insert(
+                    "ACCEPT".to_string(),
+                    "application/json"
+                        .parse()
+                        .to_owned()
+                        .expect("Failed to parse header for Coin Watch")
+                        ,
+                );
+                headers
+            },
+            base_url: "https://api.livecoinwatch.com"
+                .to_string(),
+        }
+    }
+}
+
+impl ExternalClient for CoinWatchExternalClient {
+    fn get_base_url(&self) -> String {
+        self.base_url.clone()
+    }
+
+    fn get_headers(&self) -> HashMap<String, String> {
+        self.headers.clone()
+    }
+}
+
+pub trait ExternalClient: Debug {
+    fn get_base_url(&self) -> String;
+    fn get_headers(&self) -> HashMap<String, String>;
+}
 
 #[uniffi::export(with_foreign)]
 #[async_trait::async_trait]
@@ -45,7 +101,7 @@ pub struct Gateway {
 
 #[export]
 impl Gateway {
-    /// Constructs a new [`GatewayClient`] using a "network antenna" - a type
+    /// Constructs a new [`GatewayExternalClient`] using a "network antenna" - a type
     /// implementing [`FFIOperationExecutor`] on the FFI side (Swift side), e.g.
     /// `[Swift]URLSession` which wraps the execution of a network call.
     #[uniffi::constructor]
@@ -62,10 +118,13 @@ impl Gateway {
         Vec<AggregatedCoinInformation>,
         FFIBridgeError,
     > {
+        let external_client = CoinWatchExternalClient::new();
+
         self.post(
-            "coins/list",
+            "/coins/list",
             ListOfCoinsRequest::new(1),
             res_id,
+            external_client,
         )
         .await
     }
@@ -97,25 +156,28 @@ impl Gateway {
         })
     }
 
-    async fn make_request<T, U, V, F, E>(
+    async fn make_request<T, U, V, F, E, C>(
         &self,
         path: &str,
         method: &str,
         request: T,
         map: F,
+        client: C,
     ) -> Result<V, FFIBridgeError>
     where
         T: Serialize,
         U: for<'a> Deserialize<'a>,
         F: Fn(U) -> Result<V, E>,
         E: Into<FFIBridgeError>,
+        C: ExternalClient,
     {
         // JSON serialize request into body bytes
         let body = to_vec(&request).unwrap();
 
         // Append relative path to base url
         let url = format!(
-            "http://localhost:3000/v1/{}",
+            "{}{}",
+            client.get_base_url(),
             path.to_owned()
         );
 
@@ -125,12 +187,12 @@ impl Gateway {
             url,
             body,
             method: method.to_owned(),
-            headers: HashMap::<String, String>::from_iter(
-                [(
-                    "Content-Type".to_owned(),
-                    "application/json".to_owned(),
-                )],
-            ),
+            headers: client.get_headers(), // HashMap::<String, String>::from_iter(
+                                                   //     [(
+                                                   //         "Content-Type".to_owned(),
+                                                   //         "application/json".to_owned(),
+                                                   //     )],
+                                                   // ),
         };
 
         // Let Swift side make network request and await response
@@ -149,19 +211,28 @@ impl Gateway {
         map(model).map_err(|e| e.into())
     }
 
-    pub(crate) async fn post<T, U, V, F, E>(
+    pub(crate) async fn post<T, U, V, F, E, C>(
         &self,
         path: &str,
         request: T,
         map: F,
+        client: C,
     ) -> Result<V, FFIBridgeError>
     where
         T: Serialize,
         U: for<'a> Deserialize<'a>,
         F: Fn(U) -> Result<V, E>,
         E: Into<FFIBridgeError>,
+        C: ExternalClient,
     {
-        self.make_request(path, "POST", request, map).await
+        self.make_request(
+            path,
+            "POST",
+            request,
+            map,
+            client,
+        )
+        .await
     }
 }
 
