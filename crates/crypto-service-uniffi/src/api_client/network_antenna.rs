@@ -16,7 +16,7 @@ use super::error::{
     RustSideError,
 };
 
-#[uniffi::export]
+#[uniffi::export(with_foreign)]
 #[async_trait::async_trait]
 pub trait NetworkAntenna: Send + Sync {
     async fn make_request(
