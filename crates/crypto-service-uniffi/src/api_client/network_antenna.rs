@@ -46,7 +46,7 @@ impl CoinWatchExternalClient {
                     "ACCEPT".to_string(),
                     "application/json"
                         .parse()
-                        .to_string()
+                        .to_owned()
                         .expect("Failed to parse header for Coin Watch")
                         ,
                 );
