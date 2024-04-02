@@ -117,7 +117,7 @@ impl Gateway {
 
         self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
             "/coins/list",
-            ListOfCoinsRequest::new(1),
+            ListOfCoinsRequest::new(5),
             res_id,
             external_client,
         )
@@ -143,6 +143,8 @@ impl Gateway {
         if body.is_empty() {
             return Err(RustSideError::ResponseBodyWasNil);
         }
+
+        println!("{:#?}", &body);
 
         serde_json::from_slice::<U>(&body).map_err(|_| {
             RustSideError::UnableJSONDeserializeHTTPResponseBodyIntoTypeName {
