@@ -1,13 +1,32 @@
 use anyhow::Result;
-use axum::{routing::{get, post}, Router};
-use crypto_service_server::{alphavantage_api::{alpha_handler, alpha_client::{AlphaAdvantageClient}}, api_client::{api_client::ApiClient}, binance::{binance_client::BinanceClient, orderbook_handler}, coin_watch::{coin_watch_client::CoinWatchClient, coin_watch_handlers}, state::AppState};
+use axum::{
+    routing::{get, post},
+    Router,
+};
+use crypto_service::api_client::network_antenna::Gateway;
+use crypto_service_server::{
+    alphavantage_api::{
+        alpha_client::AlphaAdvantageClient, alpha_handler,
+    },
+    api_client::api_client::ApiClient,
+    binance::{
+        binance_client::BinanceClient, orderbook_handler,
+    },
+    coin_watch::{
+        coin_watch_client::CoinWatchClient,
+        coin_watch_handlers,
+    },
+    state::AppState,
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
 
-    let binance_client: BinanceClient = BinanceClient::new();
-    let alpha_client: AlphaAdvantageClient = AlphaAdvantageClient::new();
+    let binance_client: BinanceClient =
+        BinanceClient::new();
+    let alpha_client: AlphaAdvantageClient =
+        AlphaAdvantageClient::new();
     let coin_watch_client = CoinWatchClient::new();
     let api_client = ApiClient::new();
 
@@ -28,7 +47,10 @@ async fn main() -> Result<()> {
         .route("/v1/coins/list/aggregated", post(coin_watch_handlers::get_aggregated_coin_list))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener =
+        tokio::net::TcpListener::bind("0.0.0.0:3000")
+            .await
+            .unwrap();
     axum::serve(listener, app).await.unwrap();
     Ok(())
 }

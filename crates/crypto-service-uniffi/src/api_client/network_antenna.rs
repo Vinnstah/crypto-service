@@ -220,7 +220,7 @@ impl Gateway {
         E: Into<FFIBridgeError>,
         C: ExternalClient,
     {
-        self.make_request(
+        self.make_request::<_,_,V,_,_,_>(
             path, "POST", request, map, client,
         )
         .await
