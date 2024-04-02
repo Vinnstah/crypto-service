@@ -115,7 +115,7 @@ impl Gateway {
         let external_client =
             CoinWatchExternalClient::new(key);
 
-        self.post::<_, _, Vec<Coin>, _, _, _>(
+        self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
             "/coins/list",
             ListOfCoinsRequest::new(1),
             res_id,
@@ -182,12 +182,7 @@ impl Gateway {
             url,
             body,
             method: method.to_owned(),
-            headers: client.get_headers(), // HashMap::<String, String>::from_iter(
-                                           //     [(
-                                           //         "Content-Type".to_owned(),
-                                           //         "application/json".to_owned(),
-                                           //     )],
-                                           // ),
+            headers: client.get_headers(), 
         };
 
         // Let Swift side make network request and await response
@@ -220,7 +215,7 @@ impl Gateway {
         E: Into<FFIBridgeError>,
         C: ExternalClient,
     {
-        self.make_request::<_,_,V,_,_,_>(
+        self.make_request::<_,U,V,_,_,_>(
             path, "POST", request, map, client,
         )
         .await
