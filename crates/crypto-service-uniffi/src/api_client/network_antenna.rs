@@ -1,16 +1,12 @@
-use crate::coin_watch_service::models::{
-    AggregatedCoinInformation, ListOfCoinsRequest,
-};
-use reqwest::header::{HeaderMap, ACCEPT};
+use crate::coin_watch_service::models::Coin;
+use crate::coin_watch_service::models::ListOfCoinsRequest;
 use serde::{Deserialize, Serialize};
 use serde_json::to_vec;
+use std::collections::HashMap;
 use std::convert::identity;
-use std::env;
 use std::fmt::Debug;
 use std::sync::Arc;
-use std::{collections::HashMap, sync::Mutex};
-use tokio::sync::oneshot::{channel, Sender};
-use uniffi::{export, Enum, Object, Record};
+use uniffi::{export, Object, Record};
 
 use super::error::{
     FFIBridgeError, FFINetworkingError, FFISideError,
@@ -33,14 +29,14 @@ impl CoinWatchExternalClient {
     pub fn new(key: String) -> Self {
         Self {
             headers: {
-                let mut headers: HashMap<String, String> = HashMap::new();
+                let mut headers: HashMap<String, String> =
+                    HashMap::new();
                 headers.insert(
                     "x-api-key".to_string(),
-                    key
-                    // env::var("LIVE_COIN_WATCH_API_KEY")
-                    //     .expect("No API-key found for Coin Watch")
-                    //     .parse()
-                    //     .expect("Failed to parse header for Coin Watch"),
+                    key, // env::var("LIVE_COIN_WATCH_API_KEY")
+                         //     .expect("No API-key found for Coin Watch")
+                         //     .parse()
+                         //     .expect("Failed to parse header for Coin Watch"),
                 );
                 headers.insert(
                     "ACCEPT".to_string(),
@@ -114,14 +110,12 @@ impl Gateway {
 
     pub async fn get_list_of_agg_coins(
         &self,
-        key: String
-    ) -> Result<
-        Vec<AggregatedCoinInformation>,
-        FFIBridgeError,
-    > {
-        let external_client = CoinWatchExternalClient::new(key);
+        key: String,
+    ) -> Result<Vec<Coin>, FFIBridgeError> {
+        let external_client =
+            CoinWatchExternalClient::new(key);
 
-        self.post::<_,_,Vec<Coin>,_,_,_>(
+        self.post::<_, _, Vec<Coin>, _, _, _>(
             "/coins/list",
             ListOfCoinsRequest::new(1),
             res_id,
@@ -189,11 +183,11 @@ impl Gateway {
             body,
             method: method.to_owned(),
             headers: client.get_headers(), // HashMap::<String, String>::from_iter(
-                                                   //     [(
-                                                   //         "Content-Type".to_owned(),
-                                                   //         "application/json".to_owned(),
-                                                   //     )],
-                                                   // ),
+                                           //     [(
+                                           //         "Content-Type".to_owned(),
+                                           //         "application/json".to_owned(),
+                                           //     )],
+                                           // ),
         };
 
         // Let Swift side make network request and await response
@@ -227,11 +221,7 @@ impl Gateway {
         C: ExternalClient,
     {
         self.make_request(
-            path,
-            "POST",
-            request,
-            map,
-            client,
+            path, "POST", request, map, client,
         )
         .await
     }
