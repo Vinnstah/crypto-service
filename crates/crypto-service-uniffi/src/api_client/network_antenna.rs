@@ -121,7 +121,7 @@ impl Gateway {
     > {
         let external_client = CoinWatchExternalClient::new(key);
 
-        self.post(
+        self.post::<_,_,Vec<Coin>,_,_,_>(
             "/coins/list",
             ListOfCoinsRequest::new(1),
             res_id,
