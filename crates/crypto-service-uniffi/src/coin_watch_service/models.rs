@@ -49,7 +49,7 @@ pub struct Coin {
     pub code: String,
     pub rate: f64,
     pub volume: i64,
-    pub cap: i64,
+    pub cap: Option<i64>,
     pub delta: Delta,
 }
 
@@ -77,7 +77,7 @@ impl Delta {
 }
 
 impl Coin {
-    pub fn new(code: String, rate: f64, volume: i64, cap: i64, delta: Delta) -> Self {
+    pub fn new(code: String, rate: f64, volume: i64, cap: Option<i64>, delta: Delta) -> Self {
         Self {
             code,
             rate,
