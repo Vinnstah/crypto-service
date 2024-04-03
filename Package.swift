@@ -15,8 +15,8 @@ if useLocalFramework {
 		path: "./target/ios/libcrypto_service-rs.xcframework"
 	)
 } else {
-	let releaseTag = "0.1.0"
-	let releaseChecksum = "befef7d56108305ff6ff69d67483471395c3e603e299b3b15f5a826328de272b"
+	let releaseTag = "v0.2.6"
+	let releaseChecksum = "447c110c75ec87c9a0595a64bd0d302ffb6dff3100d3bcdffc47828ec52887bd"
 	binaryTarget = .binaryTarget(
 		name: cryptoServiceBinaryTargetName,
 		url:
