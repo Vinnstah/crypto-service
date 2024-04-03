@@ -25,6 +25,12 @@ pub struct Gateway {
     pub network_antenna: Arc<dyn NetworkAntenna>,
 }
 
+// enum ClientKeys {
+//     Binance { key: String },
+//     CoinWatch { key: String },
+//     Alpha { key: String },
+// }
+
 #[export]
 impl Gateway {
     /// Constructs a new [`GatewayExternalClient`] using a "network antenna" - a type
@@ -37,18 +43,20 @@ impl Gateway {
         Self { network_antenna }
     }
 
-    pub async fn get_list_of_agg_coins(
+    pub async fn get_list_of_coins(
         &self,
         key: String,
+        limit: u32
     ) -> Result<Vec<Coin>, FFIBridgeError> {
         let external_client =
             CoinWatchExternalClient::new(key);
 
         self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
             "/coins/list",
-            ListOfCoinsRequest::new(5),
+            ListOfCoinsRequest::new(limit),
             res_id,
-            external_client,
+            NetworkAntenna::BINANCE,
+            // external_client
         )
         .await
     }

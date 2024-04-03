@@ -73,6 +73,10 @@ pub trait ExternalClient: Debug {
 #[uniffi::export(with_foreign)]
 #[async_trait::async_trait]
 pub trait NetworkAntenna: Send + Sync {
+    pub const BINANCE: String;
+    pub const COINWATCH: String;
+    pub const ALPHA: String;
+
     async fn make_request(
         &self,
         request: FFINetworkingRequest,
