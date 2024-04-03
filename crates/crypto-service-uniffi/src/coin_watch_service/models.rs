@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use uniffi::{Record, Enum};
+use uniffi::{Enum, Record};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Record)]
 pub struct ListOfCoinsRequest {
@@ -46,25 +46,32 @@ impl ListOfCoinsRequest {
 
 #[derive(Debug, Serialize, Deserialize, Record)]
 pub struct Coin {
-    pub code: String,
-    pub rate: f64,
-    pub volume: i64,
+    pub code: Option<String>,
+    pub rate: Option<f64>,
+    pub volume: Option<i64>,
     pub cap: Option<i64>,
     pub delta: Delta,
 }
 
 #[derive(Debug, Serialize, Deserialize, Record)]
 pub struct Delta {
-    pub hour: f64,
-    pub day: f64,
-    pub week: f64,
-    pub month: f64,
-    pub quarter: f64,
-    pub year: f64,
+    pub hour: Option<f64>,
+    pub day: Option<f64>,
+    pub week: Option<f64>,
+    pub month: Option<f64>,
+    pub quarter: Option<f64>,
+    pub year: Option<f64>,
 }
 
 impl Delta {
-    pub fn new(hour: f64, day: f64, week: f64, month: f64, quarter: f64, year: f64) -> Self {
+    pub fn new(
+        hour: Option<f64>,
+        day: Option<f64>,
+        week: Option<f64>,
+        month: Option<f64>,
+        quarter: Option<f64>,
+        year: Option<f64>,
+    ) -> Self {
         Self {
             hour,
             day,
@@ -77,7 +84,13 @@ impl Delta {
 }
 
 impl Coin {
-    pub fn new(code: String, rate: f64, volume: i64, cap: Option<i64>, delta: Delta) -> Self {
+    pub fn new(
+        code: Option<String>,
+        rate: Option<f64>,
+        volume: Option<i64>,
+        cap: Option<i64>,
+        delta: Delta,
+    ) -> Self {
         Self {
             code,
             rate,
@@ -97,7 +110,11 @@ pub struct CoinMetaRequest {
 
 impl CoinMetaRequest {
     pub fn new(code: String) -> Self {
-        Self { currency: "USD".into(), code, meta: true }
+        Self {
+            currency: "USD".into(),
+            code,
+            meta: true,
+        }
     }
 }
 
@@ -142,11 +159,23 @@ pub struct AggregatedCoinInformation {
     pub rank: i64,
     pub rate: f64,
     pub color: String,
-    pub png64: String
+    pub png64: String,
 }
 
 impl AggregatedCoinInformation {
-    pub fn new(name: String, symbol: String, rank: i64, rate: f64) -> Self {
-        Self { name, symbol, rank, rate, color: "".into(), png64: "".into() }
+    pub fn new(
+        name: String,
+        symbol: String,
+        rank: i64,
+        rate: f64,
+    ) -> Self {
+        Self {
+            name,
+            symbol,
+            rank,
+            rate,
+            color: "".into(),
+            png64: "".into(),
+        }
     }
 }

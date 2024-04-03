@@ -1,16 +1,18 @@
-
 use super::coin_watch_client::CoinWatchClient;
 use crate::state::AppState;
 use axum::{extract::State, http::StatusCode, Json};
 use crypto_service::coin_watch_service::models::{
-    AggregatedCoinInformation, Coin, CoinHistoryRequest, CoinMeta, CoinMetaRequest,
-    ListOfCoinsRequest,
+    AggregatedCoinInformation, Coin, CoinHistoryRequest,
+    CoinMeta, CoinMetaRequest, ListOfCoinsRequest,
 };
 
 pub async fn get_list_of_coins(
     State(state): State<AppState>,
     Json(body): Json<ListOfCoinsRequest>,
-) -> Result<(StatusCode, Json<Vec<Coin>>), (StatusCode, Json<String>)> {
+) -> Result<
+    (StatusCode, Json<Vec<Coin>>),
+    (StatusCode, Json<String>),
+> {
     state
         .api_client
         .post::<Vec<Coin>, CoinWatchClient, ListOfCoinsRequest>(
@@ -24,7 +26,10 @@ pub async fn get_list_of_coins(
 pub async fn get_coin_meta_info(
     State(state): State<AppState>,
     Json(body): Json<CoinMetaRequest>,
-) -> Result<(StatusCode, Json<CoinMeta>), (StatusCode, Json<String>)> {
+) -> Result<
+    (StatusCode, Json<CoinMeta>),
+    (StatusCode, Json<String>),
+> {
     state
         .api_client
         .post::<CoinMeta, CoinWatchClient, CoinMetaRequest>(
@@ -38,7 +43,10 @@ pub async fn get_coin_meta_info(
 pub async fn get_coin_history_info(
     State(state): State<AppState>,
     Json(body): Json<CoinHistoryRequest>,
-) -> Result<(StatusCode, Json<CoinMeta>), (StatusCode, Json<String>)> {
+) -> Result<
+    (StatusCode, Json<CoinMeta>),
+    (StatusCode, Json<String>),
+> {
     state
         .api_client
         .post::<CoinMeta, CoinWatchClient, CoinHistoryRequest>(
@@ -52,7 +60,8 @@ pub async fn get_coin_history_info(
 pub async fn get_aggregated_coin_list(
     State(state): State<AppState>,
     Json(body): Json<ListOfCoinsRequest>,
-) -> Result<Json<Vec<AggregatedCoinInformation>>, StatusCode> {
+) -> Result<Json<Vec<AggregatedCoinInformation>>, StatusCode>
+{
     // let body = ListOfCoinsRequest::new(body);
 
     let list_of_coins = state
@@ -67,7 +76,9 @@ pub async fn get_aggregated_coin_list(
 
     let mut coin_meta: Vec<CoinMeta> = vec![];
     for coin in &list_of_coins.1 .0 {
-        let coin_body = CoinMetaRequest::new(coin.code.clone());
+        let coin_body = CoinMetaRequest::new(
+            coin.code.clone().unwrap(),
+        );
         coin_meta.push(
             state
                 .api_client
@@ -81,16 +92,24 @@ pub async fn get_aggregated_coin_list(
                 .unwrap(),
         );
     }
-    let mut list_of_aggregated_coins: Vec<AggregatedCoinInformation> = vec![];
-    for (idx, coin) in list_of_coins.1 .0.iter().enumerate() {
-        list_of_aggregated_coins.push(AggregatedCoinInformation {
-            name: coin_meta[idx].name.clone(),
-            symbol: coin_meta[idx].symbol.clone().unwrap_or("0".to_string()),
-            rank: coin_meta[idx].rank,
-            rate: coin.rate,
-            color: coin_meta[idx].color.clone(),
-            png64: coin_meta[idx].png64.clone(),
-        })
+    let mut list_of_aggregated_coins: Vec<
+        AggregatedCoinInformation,
+    > = vec![];
+    for (idx, coin) in list_of_coins.1 .0.iter().enumerate()
+    {
+        list_of_aggregated_coins.push(
+            AggregatedCoinInformation {
+                name: coin_meta[idx].name.clone(),
+                symbol: coin_meta[idx]
+                    .symbol
+                    .clone()
+                    .unwrap_or("0".to_string()),
+                rank: coin_meta[idx].rank,
+                rate: coin.rate.unwrap(),
+                color: coin_meta[idx].color.clone(),
+                png64: coin_meta[idx].png64.clone(),
+            },
+        )
     }
     Ok(axum::Json(list_of_aggregated_coins))
 }
