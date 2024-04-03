@@ -1,10 +1,12 @@
+use std::fmt::Debug;
+
 use serde::{Deserialize, Serialize};
 use uniffi::{Enum, Record};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Record)]
 pub struct ListOfCoinsRequest {
     currency: String,
-    sort: Sort,
+    sort: String,
     order: String,
     offset: u8,
     limit: u32,
@@ -35,7 +37,7 @@ impl ListOfCoinsRequest {
     pub fn new(limit: u32) -> Self {
         Self {
             currency: "USD".into(),
-            sort: Sort::Rank,
+            sort: "rank".into(),
             order: "ascending".into(),
             offset: 0,
             limit,

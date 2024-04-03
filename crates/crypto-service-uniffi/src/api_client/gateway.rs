@@ -2,22 +2,17 @@ use crate::api_client::network_antenna::ExternalClient;
 use crate::api_client::network_antenna::FFINetworkingRequest;
 use crate::api_client::network_antenna::FFINetworkingResponse;
 use crate::coin_watch_service::models::Coin;
+use crate::coin_watch_service::models::CoinMeta;
+use crate::coin_watch_service::models::CoinMetaRequest;
 use crate::coin_watch_service::models::ListOfCoinsRequest;
-use axum::extract::FromRequest;
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use serde_json::to_vec;
-use std::collections::HashMap;
 use std::convert::identity;
-use std::fmt::Debug;
 use std::sync::Arc;
-use uniffi::Enum;
 use uniffi::{export, Object, Record};
 
-use super::error::{
-    FFIBridgeError, FFINetworkingError, FFISideError,
-    RustSideError,
-};
+use super::error::{FFIBridgeError, RustSideError};
 use crate::api_client::network_antenna::CoinWatchExternalClient;
 use crate::api_client::network_antenna::NetworkAntenna;
 
@@ -54,16 +49,32 @@ impl Gateway {
 
     pub async fn get_list_of_coins(
         &self,
-        key: String,
         limit: u32,
     ) -> Result<Vec<Coin>, FFIBridgeError> {
         let external_client = CoinWatchExternalClient::new(
-            self.network_antenna.get_coinwatch_key().coin_watch,
+            self.network_antenna.get_api_keys().coin_watch,
         );
 
         self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
             "/coins/list",
             ListOfCoinsRequest::new(limit),
+            res_id,
+            external_client,
+        )
+        .await
+    }
+
+    pub async fn get_coin_meta_info(
+        &self,
+        code: String,
+    ) -> Result<CoinMeta, FFIBridgeError> {
+        let external_client = CoinWatchExternalClient::new(
+            self.network_antenna.get_api_keys().coin_watch,
+        );
+
+        self.post::<_, CoinMeta, CoinMeta, _, _, _>(
+            "/coins/single",
+            CoinMetaRequest::new(code),
             res_id,
             external_client,
         )

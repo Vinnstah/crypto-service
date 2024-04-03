@@ -1,6 +1,4 @@
-use super::{
-    api_client::ApiClient,
-};
+use super::api_client::ApiClient;
 use axum::http::StatusCode;
 use crypto_service::client_trait::Client;
 use reqwest::Request;

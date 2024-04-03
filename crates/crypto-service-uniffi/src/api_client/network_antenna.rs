@@ -1,17 +1,10 @@
-use crate::coin_watch_service::models::Coin;
-use crate::coin_watch_service::models::ListOfCoinsRequest;
-use serde::{Deserialize, Serialize};
-use serde_json::to_vec;
 use std::collections::HashMap;
-use std::convert::identity;
 use std::fmt::Debug;
-use std::sync::Arc;
-use uniffi::{export, Object, Record};
+use uniffi::{Record};
 use crate::api_client::gateway::ClientKeys;
 
 use super::error::{
-    FFIBridgeError, FFINetworkingError, FFISideError,
-    RustSideError,
+    FFIBridgeError, FFINetworkingError,
 };
 
 #[derive(PartialEq, Debug, Clone)]
@@ -34,10 +27,7 @@ impl CoinWatchExternalClient {
                     HashMap::new();
                 headers.insert(
                     "x-api-key".to_string(),
-                    key, // env::var("LIVE_COIN_WATCH_API_KEY")
-                         //     .expect("No API-key found for Coin Watch")
-                         //     .parse()
-                         //     .expect("Failed to parse header for Coin Watch"),
+                    key, 
                 );
                 headers.insert(
                     "ACCEPT".to_string(),
@@ -77,9 +67,7 @@ pub trait NetworkAntenna: Send + Sync {
         &self,
         request: FFINetworkingRequest,
     ) -> Result<FFINetworkingResponse, FFINetworkingError>;
-    fn get_binance_key(&self) -> ClientKeys;
-    fn get_coinwatch_key(&self) -> ClientKeys;
-    fn get_alpha_key(&self) -> ClientKeys;
+    fn get_api_keys(&self) -> ClientKeys;
 }
 
 #[derive(Record, Clone, Debug, PartialEq, Eq)]
