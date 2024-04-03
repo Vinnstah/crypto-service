@@ -3,7 +3,6 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use crypto_service::api_client::network_antenna::Gateway;
 use crypto_service_server::{
     alphavantage_api::{
         alpha_client::AlphaAdvantageClient, alpha_handler,

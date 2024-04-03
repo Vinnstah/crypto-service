@@ -3,18 +3,9 @@
 
 A Crypto REST API-backend written in Rust with Axum. 
 
-# TODO
-- [ ] Endpoints
-- [ ] Binance requests
-    - [x] GET Orderbook
-        - [ ] Tests
-    - [x] GET Recent Trades
-    - [ ] Set up websocket
-    - [ ] POST mock trade
-- [ ] Authentication Middleware
-- [x] Add CodeCov
-- [ ] Tests
-- [x] CI/CD
-    - [x] Add GitHub Actions
-- [ ] Open API specs
-- [ ] More robust error handling
+# Background
+This project came to life from wanting to develop a API-backend in Rust. 
+
+# How do I use it?
+The project can be run locally after add a `.env` with the API-keys or in the cloud by containerizing it.
+There is also the option to bundle the binary directly in your iOS-app by using uniFFI generated bindings (WIP).
