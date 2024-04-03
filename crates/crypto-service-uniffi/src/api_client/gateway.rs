@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use std::convert::identity;
 use std::fmt::Debug;
 use std::sync::Arc;
+use uniffi::Enum;
 use uniffi::{export, Object, Record};
 
 use super::error::{
@@ -25,11 +26,19 @@ pub struct Gateway {
     pub network_antenna: Arc<dyn NetworkAntenna>,
 }
 
-// enum ClientKeys {
+// #[derive(Enum)]
+// pub enum ClientKeys {
 //     Binance { key: String },
 //     CoinWatch { key: String },
 //     Alpha { key: String },
 // }
+
+#[derive(Record)]
+pub struct ClientKeys {
+    pub binance: String,
+    pub coin_watch: String,
+    pub alpha: String,
+}
 
 #[export]
 impl Gateway {
@@ -46,17 +55,17 @@ impl Gateway {
     pub async fn get_list_of_coins(
         &self,
         key: String,
-        limit: u32
+        limit: u32,
     ) -> Result<Vec<Coin>, FFIBridgeError> {
-        let external_client =
-            CoinWatchExternalClient::new(key);
+        let external_client = CoinWatchExternalClient::new(
+            self.network_antenna.get_coinwatch_key().coin_watch,
+        );
 
         self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
             "/coins/list",
             ListOfCoinsRequest::new(limit),
             res_id,
-            NetworkAntenna::BINANCE,
-            // external_client
+            external_client,
         )
         .await
     }

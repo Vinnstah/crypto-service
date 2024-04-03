@@ -7,12 +7,12 @@ use std::convert::identity;
 use std::fmt::Debug;
 use std::sync::Arc;
 use uniffi::{export, Object, Record};
+use crate::api_client::gateway::ClientKeys;
 
 use super::error::{
     FFIBridgeError, FFINetworkingError, FFISideError,
     RustSideError,
 };
-
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinWatchExternalClient {
@@ -73,14 +73,13 @@ pub trait ExternalClient: Debug {
 #[uniffi::export(with_foreign)]
 #[async_trait::async_trait]
 pub trait NetworkAntenna: Send + Sync {
-    pub const BINANCE: String;
-    pub const COINWATCH: String;
-    pub const ALPHA: String;
-
     async fn make_request(
         &self,
         request: FFINetworkingRequest,
     ) -> Result<FFINetworkingResponse, FFINetworkingError>;
+    fn get_binance_key(&self) -> ClientKeys;
+    fn get_coinwatch_key(&self) -> ClientKeys;
+    fn get_alpha_key(&self) -> ClientKeys;
 }
 
 #[derive(Record, Clone, Debug, PartialEq, Eq)]
