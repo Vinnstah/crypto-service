@@ -99,15 +99,15 @@ pub async fn get_aggregated_coin_list(
     {
         list_of_aggregated_coins.push(
             AggregatedCoinInformation {
-                name: coin_meta[idx].name.clone(),
+                name: coin_meta[idx].name.clone().unwrap_or("".into()),
                 symbol: coin_meta[idx]
                     .symbol
                     .clone()
                     .unwrap_or("0".to_string()),
-                rank: coin_meta[idx].rank,
+                rank: coin_meta[idx].rank.unwrap_or(0.into()),
                 rate: coin.rate.unwrap(),
-                color: coin_meta[idx].color.clone(),
-                png64: coin_meta[idx].png64.clone(),
+                color: coin_meta[idx].color.clone().unwrap_or("".into()),
+                png64: coin_meta[idx].png64.clone().unwrap_or("".into()),
             },
         )
     }

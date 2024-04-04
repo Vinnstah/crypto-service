@@ -1,7 +1,6 @@
 use crate::api_client::network_antenna::ExternalClient;
 use crate::api_client::network_antenna::FFINetworkingRequest;
 use crate::api_client::network_antenna::FFINetworkingResponse;
-use crate::coin_watch_service::models::Coin;
 use crate::coin_watch_service::models::CoinMeta;
 use crate::coin_watch_service::models::CoinMetaRequest;
 use crate::coin_watch_service::models::ListOfCoinsRequest;
@@ -49,7 +48,7 @@ impl Gateway {
         );
         let request = ListOfCoinsRequest::new(limit);
         
-        self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
+        self.post::<_, Vec<CoinMeta>, Vec<CoinMeta>, _, _, _>(
             "/coins/list",
             request,
             res_id,
