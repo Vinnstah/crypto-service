@@ -37,8 +37,8 @@ pub struct ClientKeys {
 
 #[export]
 impl Gateway {
-    /// Constructs a new [`GatewayExternalClient`] using a "network antenna" - a type
-    /// implementing [`FFIOperationExecutor`] on the FFI side (Swift side), e.g.
+    /// Constructs a new [`Gateway`] using a "network antenna" - a type
+    /// implementing [`NetworkAntenna`] on the FFI side (Swift side), e.g.
     /// `[Swift]URLSession` which wraps the execution of a network call.
     #[uniffi::constructor]
     pub fn new(
@@ -54,16 +54,18 @@ impl Gateway {
         let external_client = CoinWatchExternalClient::new(
             self.network_antenna.get_api_keys().coin_watch,
         );
-
+        let request = ListOfCoinsRequest::new(limit);
+        println!("{:#?}", &request);
+        
         self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
             "/coins/list",
-            ListOfCoinsRequest::new(limit),
+            request,
             res_id,
             external_client,
         )
         .await
     }
-
+    
     pub async fn get_coin_meta_info(
         &self,
         code: String,
@@ -71,10 +73,12 @@ impl Gateway {
         let external_client = CoinWatchExternalClient::new(
             self.network_antenna.get_api_keys().coin_watch,
         );
-
+        let request = CoinMetaRequest::new(code);
+        println!("{:#?}", &request);
+        
         self.post::<_, CoinMeta, CoinMeta, _, _, _>(
             "/coins/single",
-            CoinMetaRequest::new(code),
+            request,
             res_id,
             external_client,
         )
@@ -93,6 +97,7 @@ impl Gateway {
         if let 200..=299 = response.status_code {
             // all good
         } else {
+            println!("{:#?}", response.body);
             return Err(RustSideError::BadResponseCode);
         }
 
@@ -121,22 +126,23 @@ impl Gateway {
         client: C,
     ) -> Result<V, FFIBridgeError>
     where
-        T: Serialize,
+        T: Serialize + std::fmt::Debug,
         U: for<'a> Deserialize<'a> + std::fmt::Debug,
         F: Fn(U) -> Result<V, E>,
         E: Into<FFIBridgeError>,
         C: ExternalClient,
     {
+        println!("{:#?}", &request);
         // JSON serialize request into body bytes
         let body = to_vec(&request).unwrap();
-
+        
         // Append relative path to base url
         let url = format!(
             "{}{}",
             client.get_base_url(),
             path.to_owned()
         );
-
+        
         // Create Network request object, which will be translated by
         // Swift side into a `[Swift]URLRequest`
         let request = FFINetworkingRequest {
@@ -145,16 +151,18 @@ impl Gateway {
             method: method.to_owned(),
             headers: client.get_headers(),
         };
-
+        println!("{:#?}", &request);
+        
         // Let Swift side make network request and await response
         // let response = self.networking_dispatcher.dispatch(request).await?;
         let response = self
-            .network_antenna
-            .make_request(request)
-            .await?;
-        // Read out HTTP body from response and JSON parse it into U
-        let model =
-            self.model_from_response(response).map_err(
+        .network_antenna
+        .make_request(request)
+        .await?;
+    // Read out HTTP body from response and JSON parse it into U
+    println!("{:#?}", &response);
+    let model =
+    self.model_from_response(response).map_err(
                 |error| FFIBridgeError::FromRust { error },
             )?;
         // return model
@@ -170,7 +178,7 @@ impl Gateway {
         client: C,
     ) -> Result<V, FFIBridgeError>
     where
-        T: Serialize,
+        T: Serialize + std::fmt::Debug,
         U: for<'a> Deserialize<'a> + std::fmt::Debug,
         F: Fn(U) -> Result<V, E>,
         E: Into<FFIBridgeError>,
