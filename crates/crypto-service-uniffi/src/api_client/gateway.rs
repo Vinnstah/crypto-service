@@ -55,7 +55,6 @@ impl Gateway {
             self.network_antenna.get_api_keys().coin_watch,
         );
         let request = ListOfCoinsRequest::new(limit);
-        println!("{:#?}", &request);
         
         self.post::<_, Vec<Coin>, Vec<Coin>, _, _, _>(
             "/coins/list",
@@ -74,7 +73,6 @@ impl Gateway {
             self.network_antenna.get_api_keys().coin_watch,
         );
         let request = CoinMetaRequest::new(code);
-        println!("{:#?}", &request);
         
         self.post::<_, CoinMeta, CoinMeta, _, _, _>(
             "/coins/single",
@@ -97,7 +95,6 @@ impl Gateway {
         if let 200..=299 = response.status_code {
             // all good
         } else {
-            println!("{:#?}", response.body);
             return Err(RustSideError::BadResponseCode);
         }
 
@@ -132,7 +129,6 @@ impl Gateway {
         E: Into<FFIBridgeError>,
         C: ExternalClient,
     {
-        println!("{:#?}", &request);
         // JSON serialize request into body bytes
         let body = to_vec(&request).unwrap();
         
@@ -160,7 +156,6 @@ impl Gateway {
         .make_request(request)
         .await?;
     // Read out HTTP body from response and JSON parse it into U
-    println!("{:#?}", &response);
     let model =
     self.model_from_response(response).map_err(
                 |error| FFIBridgeError::FromRust { error },

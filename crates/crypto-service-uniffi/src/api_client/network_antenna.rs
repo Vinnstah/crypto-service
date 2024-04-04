@@ -30,7 +30,7 @@ impl CoinWatchExternalClient {
                     key, 
                 );
                 headers.insert(
-                    "ACCEPT".to_string(),
+                    "content-type".to_string(),
                     "application/json"
                         .parse()
                         .to_owned()
