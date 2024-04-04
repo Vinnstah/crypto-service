@@ -41,10 +41,11 @@ impl ListOfCoinsRequest {
             order: "ascending".into(),
             offset: 0,
             limit,
-            meta: false,
+            meta: true,
         }
     }
 }
+
 
 #[derive(Debug, Serialize, Deserialize, Record)]
 pub struct Coin {
@@ -55,7 +56,7 @@ pub struct Coin {
     pub delta: Delta,
 }
 
-#[derive(Debug, Serialize, Deserialize, Record)]
+#[derive(Debug, Serialize, Deserialize, Record, Clone)]
 pub struct Delta {
     pub hour: Option<f64>,
     pub day: Option<f64>,
@@ -120,24 +121,20 @@ impl CoinMetaRequest {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Record)]
+#[derive(Debug, Clone, Serialize, Deserialize, Record)]
 #[serde(rename_all = "camelCase")]
 pub struct CoinMeta {
-    pub code: Option<String>,
-    pub name: String,
+    pub name: Option<String>,
     pub symbol: Option<String>,
-    pub rank: i64,
-    pub age: i64,
-    pub color: String,
-    pub png32: String,
-    pub png64: String,
-    pub webp32: String,
-    pub webp64: String,
+    pub rank: Option<i64>,
+    pub color: Option<String>,
+    pub png64: Option<String>,
+    pub webp64: Option<String>,
     #[serde(rename = "allTimeHighUSD")]
-    pub all_time_high_usd: f64,
-    pub links: Links,
+    pub all_time_high_usd: Option<f64>,
+    pub code: Option<String>,
+    pub rate: Option<f64>,
     pub delta: Option<Delta>,
-    pub history: Option<Vec<History>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Record)]
