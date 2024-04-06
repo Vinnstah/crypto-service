@@ -22,6 +22,23 @@ pub struct CoinHistoryRequest {
     meta: bool,
 }
 
+impl CoinHistoryRequest {
+    pub fn new(
+        code: String,
+        start: u64,
+        end: u64,
+        meta: bool,
+    ) -> Self {
+        Self {
+            currency: "USD".into(),
+            code,
+            start,
+            end,
+            meta,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Enum)]
 #[serde(rename_all = "lowercase")]
 pub enum Sort {
@@ -45,7 +62,6 @@ impl ListOfCoinsRequest {
         }
     }
 }
-
 
 #[derive(Debug, Serialize, Deserialize, Record)]
 pub struct Coin {
@@ -131,6 +147,7 @@ pub struct CoinMeta {
     pub png64: Option<String>,
     pub webp64: Option<String>,
     #[serde(rename = "allTimeHighUSD")]
+    pub history: Option<History>,
     pub all_time_high_usd: Option<f64>,
     pub code: Option<String>,
     pub rate: Option<f64>,

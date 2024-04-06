@@ -1,6 +1,7 @@
 use crate::api_client::network_antenna::ExternalClient;
 use crate::api_client::network_antenna::FFINetworkingRequest;
 use crate::api_client::network_antenna::FFINetworkingResponse;
+use crate::coin_watch_service::models::CoinHistoryRequest;
 use crate::coin_watch_service::models::CoinMeta;
 use crate::coin_watch_service::models::CoinMetaRequest;
 use crate::coin_watch_service::models::ListOfCoinsRequest;
@@ -47,7 +48,7 @@ impl Gateway {
             self.network_antenna.get_api_keys().coin_watch,
         );
         let request = ListOfCoinsRequest::new(limit);
-        
+
         self.post::<_, Vec<CoinMeta>, Vec<CoinMeta>, _, _, _>(
             "/coins/list",
             request,
@@ -56,7 +57,7 @@ impl Gateway {
         )
         .await
     }
-    
+
     pub async fn get_coin_meta_info(
         &self,
         code: String,
@@ -65,9 +66,31 @@ impl Gateway {
             self.network_antenna.get_api_keys().coin_watch,
         );
         let request = CoinMetaRequest::new(code);
-        
+
         self.post::<_, CoinMeta, CoinMeta, _, _, _>(
             "/coins/single",
+            request,
+            res_id,
+            external_client,
+        )
+        .await
+    }
+
+    pub async fn get_coin_history_info(
+        &self,
+        code: String,
+        start: u64,
+        end: u64,
+        meta: bool,
+    ) -> Result<CoinMeta, FFIBridgeError> {
+        let external_client = CoinWatchExternalClient::new(
+            self.network_antenna.get_api_keys().coin_watch,
+        );
+        let request =
+            CoinHistoryRequest::new(code, start, end, meta);
+
+        self.post::<_, CoinMeta, CoinMeta, _, _, _>(
+            "/coins/single/history",
             request,
             res_id,
             external_client,
@@ -97,7 +120,6 @@ impl Gateway {
 
         let json: Json<U> = axum::Json::from_bytes(&body)
             .expect("Failed to deserialize");
-        println!("{:#?}", json.0);
 
         serde_json::from_slice::<U>(&body).map_err(|_| {
             RustSideError::UnableJSONDeserializeHTTPResponseBodyIntoTypeName {
@@ -123,14 +145,14 @@ impl Gateway {
     {
         // JSON serialize request into body bytes
         let body = to_vec(&request).unwrap();
-        
+
         // Append relative path to base url
         let url = format!(
             "{}{}",
             client.get_base_url(),
             path.to_owned()
         );
-        
+
         // Create Network request object, which will be translated by
         // Swift side into a `[Swift]URLRequest`
         let request = FFINetworkingRequest {
@@ -140,16 +162,16 @@ impl Gateway {
             headers: client.get_headers(),
         };
         println!("{:#?}", &request);
-        
+
         // Let Swift side make network request and await response
         // let response = self.networking_dispatcher.dispatch(request).await?;
         let response = self
-        .network_antenna
-        .make_request(request)
-        .await?;
-    // Read out HTTP body from response and JSON parse it into U
-    let model =
-    self.model_from_response(response).map_err(
+            .network_antenna
+            .make_request(request)
+            .await?;
+        // Read out HTTP body from response and JSON parse it into U
+        let model =
+            self.model_from_response(response).map_err(
                 |error| FFIBridgeError::FromRust { error },
             )?;
         // return model
