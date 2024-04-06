@@ -60,12 +60,11 @@ impl Gateway {
 
     pub async fn get_coin_meta_info(
         &self,
-        code: String,
+        request: CoinMetaRequest
     ) -> Result<CoinMeta, FFIBridgeError> {
         let external_client = CoinWatchExternalClient::new(
             self.network_antenna.get_api_keys().coin_watch,
         );
-        let request = CoinMetaRequest::new(code);
 
         self.post::<_, CoinMeta, CoinMeta, _, _, _>(
             "/coins/single",
@@ -78,16 +77,11 @@ impl Gateway {
 
     pub async fn get_coin_history_info(
         &self,
-        code: String,
-        start: u64,
-        end: u64,
-        meta: bool,
+        request: CoinHistoryRequest,
     ) -> Result<CoinMeta, FFIBridgeError> {
         let external_client = CoinWatchExternalClient::new(
             self.network_antenna.get_api_keys().coin_watch,
         );
-        let request =
-            CoinHistoryRequest::new(code, start, end, meta);
 
         self.post::<_, CoinMeta, CoinMeta, _, _, _>(
             "/coins/single/history",
