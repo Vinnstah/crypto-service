@@ -156,6 +156,7 @@ pub struct CoinMeta {
 #[derive(Debug, Clone, Serialize, Deserialize, Record)]
 #[serde(rename_all = "camelCase")]
 pub struct CoinHistory {
+    pub code: Option<String>,
     pub name: Option<String>,
     pub symbol: Option<String>,
     pub rank: Option<i64>,
@@ -163,22 +164,21 @@ pub struct CoinHistory {
     pub png64: Option<String>,
     pub webp64: Option<String>,
     #[serde(rename = "allTimeHighUSD")]
-    pub history: Option<Vec<History>>,
     pub all_time_high_usd: Option<f64>,
-    pub code: Option<String>,
-    pub rate: Option<f64>,
-    pub delta: Option<Delta>,
+    pub links: Option<Links>,
+    pub history: Option<Vec<History>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Record)]
 pub struct History {
-    pub date: i64,
-    pub rate: f64,
-    pub volume: i64,
-    pub cap: i64,
+    pub date: Option<i64>,
+    pub rate: Option<f64>,
+    pub volume: Option<i64>,
+    pub cap: Option<i64>,
+    pub liquidity: Option<i64>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Record)]
+#[derive(Debug, Serialize, Deserialize, Clone, Record)]
 pub struct Links {
     pub website: Option<String>,
     pub whitepaper: Option<String>,

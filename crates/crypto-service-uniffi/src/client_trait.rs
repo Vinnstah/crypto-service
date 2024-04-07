@@ -2,6 +2,10 @@ use core::fmt::Debug;
 use std::collections::HashMap;
 use reqwest::header::HeaderMap;
 
+pub trait Asset: Send {
+    
+}
+
 pub trait Client: Debug {
     fn get_base_url(&self) -> String;
     fn get_headers(&self) -> HeaderMap;
