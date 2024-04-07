@@ -163,7 +163,7 @@ pub struct CoinHistory {
     pub png64: Option<String>,
     pub webp64: Option<String>,
     #[serde(rename = "allTimeHighUSD")]
-    pub history: Option<History>,
+    pub history: Option<Vec<History>>,
     pub all_time_high_usd: Option<f64>,
     pub code: Option<String>,
     pub rate: Option<f64>,
