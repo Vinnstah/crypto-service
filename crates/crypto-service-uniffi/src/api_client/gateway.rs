@@ -1,11 +1,11 @@
 use crate::api_client::network_antenna::ExternalClient;
 use crate::api_client::network_antenna::FFINetworkingRequest;
 use crate::api_client::network_antenna::FFINetworkingResponse;
+use crate::coin_watch_service::models::CoinHistory;
 use crate::coin_watch_service::models::CoinHistoryRequest;
 use crate::coin_watch_service::models::CoinMeta;
 use crate::coin_watch_service::models::CoinMetaRequest;
 use crate::coin_watch_service::models::ListOfCoinsRequest;
-use axum::Json;
 use serde::{Deserialize, Serialize};
 use serde_json::to_vec;
 use std::convert::identity;
@@ -60,7 +60,7 @@ impl Gateway {
 
     pub async fn get_coin_meta_info(
         &self,
-        request: CoinMetaRequest
+        request: CoinMetaRequest,
     ) -> Result<CoinMeta, FFIBridgeError> {
         let external_client = CoinWatchExternalClient::new(
             self.network_antenna.get_api_keys().coin_watch,
@@ -78,12 +78,12 @@ impl Gateway {
     pub async fn get_coin_history_info(
         &self,
         request: CoinHistoryRequest,
-    ) -> Result<CoinMeta, FFIBridgeError> {
+    ) -> Result<CoinHistory, FFIBridgeError> {
         let external_client = CoinWatchExternalClient::new(
             self.network_antenna.get_api_keys().coin_watch,
         );
 
-        self.post::<_, CoinMeta, CoinMeta, _, _, _>(
+        self.post::<_, CoinHistory, CoinHistory, _, _, _>(
             "/coins/single/history",
             request,
             res_id,
@@ -111,9 +111,6 @@ impl Gateway {
         if body.is_empty() {
             return Err(RustSideError::ResponseBodyWasNil);
         }
-
-        let json: Json<U> = axum::Json::from_bytes(&body)
-            .expect("Failed to deserialize");
 
         serde_json::from_slice::<U>(&body).map_err(|_| {
             RustSideError::UnableJSONDeserializeHTTPResponseBodyIntoTypeName {

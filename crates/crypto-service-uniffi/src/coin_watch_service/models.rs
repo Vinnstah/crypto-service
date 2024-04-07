@@ -147,6 +147,22 @@ pub struct CoinMeta {
     pub png64: Option<String>,
     pub webp64: Option<String>,
     #[serde(rename = "allTimeHighUSD")]
+    pub all_time_high_usd: Option<f64>,
+    pub code: Option<String>,
+    pub rate: Option<f64>,
+    pub delta: Option<Delta>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Record)]
+#[serde(rename_all = "camelCase")]
+pub struct CoinHistory {
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub rank: Option<i64>,
+    pub color: Option<String>,
+    pub png64: Option<String>,
+    pub webp64: Option<String>,
+    #[serde(rename = "allTimeHighUSD")]
     pub history: Option<History>,
     pub all_time_high_usd: Option<f64>,
     pub code: Option<String>,
