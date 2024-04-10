@@ -1,11 +1,13 @@
-use crate::api_client::network_antenna::ExternalClient;
-use crate::api_client::network_antenna::FFINetworkingRequest;
-use crate::api_client::network_antenna::FFINetworkingResponse;
-use crate::coin_watch_service::models::CoinHistory;
-use crate::coin_watch_service::models::CoinHistoryRequest;
-use crate::coin_watch_service::models::CoinMeta;
-use crate::coin_watch_service::models::CoinMetaRequest;
-use crate::coin_watch_service::models::ListOfCoinsRequest;
+use crate::{
+    api_client::network_antenna::{
+        ExternalClient, FFINetworkingRequest,
+        FFINetworkingResponse,
+    },
+    coin_watch_service::models::{
+        CoinHistory, CoinHistoryRequest, CoinMeta,
+        CoinMetaRequest, ListOfCoinsRequest,
+    },
+};
 use serde::{Deserialize, Serialize};
 use serde_json::to_vec;
 use std::convert::identity;
@@ -13,8 +15,9 @@ use std::sync::Arc;
 use uniffi::{export, Object, Record};
 
 use super::error::{FFIBridgeError, RustSideError};
-use crate::api_client::network_antenna::CoinWatchExternalClient;
-use crate::api_client::network_antenna::NetworkAntenna;
+use crate::api_client::network_antenna::{
+    CoinWatchExternalClient, NetworkAntenna,
+};
 
 #[derive(Object)]
 pub struct Gateway {

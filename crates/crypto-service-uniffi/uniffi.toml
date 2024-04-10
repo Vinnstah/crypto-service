@@ -1,5 +1,6 @@
 [bindings.swift]
 generate_immutable_records = true
+experimental_sendable_value_types = true
 
 [bindings.swift.custom_types.Uuid]
 # Name of the type in the Swift code
