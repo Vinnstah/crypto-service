@@ -155,7 +155,6 @@ impl Gateway {
             method: method.to_owned(),
             headers: client.get_headers(),
         };
-        println!("{:#?}", &request);
 
         // Let Swift side make network request and await response
         // let response = self.networking_dispatcher.dispatch(request).await?;
