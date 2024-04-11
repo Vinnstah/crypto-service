@@ -211,3 +211,129 @@ impl AggregatedCoinInformation {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::coin_watch_service::models::{
+        AggregatedCoinInformation, Coin,
+        CoinHistoryRequest, CoinMetaRequest, Delta,
+        ListOfCoinsRequest,
+    };
+
+    #[test]
+    fn new_coin_history_request_currency() {
+        assert_eq!(
+            CoinHistoryRequest::new(
+                "BTC".into(),
+                123456789,
+                123456799,
+                false
+            )
+            .currency,
+            "USD".to_string()
+        );
+    }
+
+    #[test]
+    fn new_list_of_coins_request_limit() {
+        assert_eq!(ListOfCoinsRequest::new(15).limit, 15);
+    }
+
+    #[test]
+    fn new_list_of_coins_request_sort_rank() {
+        assert_eq!(
+            ListOfCoinsRequest::new(15).sort,
+            "rank"
+        );
+    }
+
+    #[test]
+    fn new_list_of_coins_request_currency() {
+        assert_eq!(
+            ListOfCoinsRequest::new(15).currency,
+            "USD"
+        );
+    }
+
+    #[test]
+    fn new_list_of_coins_request_order_ascending() {
+        assert_eq!(
+            ListOfCoinsRequest::new(15).order,
+            "ascending"
+        );
+    }
+
+    #[test]
+    fn new_delta_hour() {
+        assert_eq!(
+            Delta::new(
+                Some(12.0),
+                Some(123.0),
+                Some(1234.0),
+                Some(12345.0),
+                Some(123456.0),
+                Some(1234567.0)
+            )
+            .hour,
+            Some(12.0)
+        );
+    }
+
+    #[test]
+    fn new_coin() {
+        assert_eq!(
+            Coin::new(
+                Some("BTC".into()),
+                Some(1234.0),
+                Some(1234567),
+                Some(12),
+                Delta::new(
+                    Some(12.0),
+                    Some(123.0),
+                    Some(1234.0),
+                    Some(12345.0),
+                    Some(123456.0),
+                    Some(1234567.0)
+                )
+            )
+            .code,
+            Some("BTC".into())
+        );
+    }
+
+    #[test]
+    fn new_coin_meta_request_currency() {
+        assert_eq!(
+            CoinMetaRequest::new("BTC".into()).currency,
+            "USD".to_string()
+        );
+    }
+
+    #[test]
+    fn new_aggregated_coin_information_png64() {
+        assert_eq!(
+            AggregatedCoinInformation::new(
+                "Bitcoin".to_string(),
+                "BTC".to_string(),
+                0,
+                123456.0
+            )
+            .png64,
+            ""
+        );
+    }
+
+    #[test]
+    fn new_aggregated_coin_information_color() {
+        assert_eq!(
+            AggregatedCoinInformation::new(
+                "Bitcoin".to_string(),
+                "BTC".to_string(),
+                0,
+                123456.0
+            )
+            .color,
+            ""
+        );
+    }
+}
