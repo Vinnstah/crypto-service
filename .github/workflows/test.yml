@@ -19,7 +19,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: actions-rs/toolchain@master
         with:
-          toolchain: nightly-2024-03-28
+          toolchain: nightly-2024-01-11
           default: true
 
       - name: Install cargo tarpaulin
