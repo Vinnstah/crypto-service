@@ -1,11 +1,9 @@
+use crate::api_client::gateway::ClientKeys;
 use std::collections::HashMap;
 use std::fmt::Debug;
-use uniffi::{Record};
-use crate::api_client::gateway::ClientKeys;
+use uniffi::Record;
 
-use super::error::{
-    FFIBridgeError, FFINetworkingError,
-};
+use super::error::{FFIBridgeError, FFINetworkingError};
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinWatchExternalClient {
@@ -15,7 +13,7 @@ pub struct CoinWatchExternalClient {
 
 impl Default for CoinWatchExternalClient {
     fn default() -> Self {
-        Self::new("Test".to_string())
+        Self::new("Default Key".to_string())
     }
 }
 
@@ -25,10 +23,8 @@ impl CoinWatchExternalClient {
             headers: {
                 let mut headers: HashMap<String, String> =
                     HashMap::new();
-                headers.insert(
-                    "x-api-key".to_string(),
-                    key, 
-                );
+                headers
+                    .insert("x-api-key".to_string(), key);
                 headers.insert(
                     "content-type".to_string(),
                     "application/json"
@@ -67,6 +63,7 @@ pub trait NetworkAntenna: Send + Sync {
         &self,
         request: FFINetworkingRequest,
     ) -> Result<FFINetworkingResponse, FFINetworkingError>;
+
     fn get_api_keys(&self) -> ClientKeys;
 }
 
@@ -92,5 +89,133 @@ impl From<FFINetworkingError> for FFIBridgeError {
         Self::FromFFI {
             error: value.into(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::api_client::{
+        error::{
+            FFIBridgeError, FFINetworkingError,
+            FFISideError,
+        },
+        network_antenna::{
+            CoinWatchExternalClient, ExternalClient,
+        },
+    };
+
+    #[test]
+    fn equality() {
+        assert_eq!(
+            CoinWatchExternalClient::new("Link".into()),
+            CoinWatchExternalClient::new("Link".into())
+        );
+    }
+
+    #[test]
+    fn inequality() {
+        assert_ne!(
+            CoinWatchExternalClient::new("Link".into()),
+            CoinWatchExternalClient::new("Zelda".into())
+        );
+    }
+
+    #[test]
+    fn new_coinwatch_client_with_key() {
+        assert_eq!(
+            CoinWatchExternalClient::new("API_KEY".into())
+                .headers
+                .get("x-api-key")
+                .expect("Failed to unwrap")
+                .to_owned(),
+            "API_KEY".to_string()
+        );
+    }
+
+    #[test]
+    fn new_coinwatch_client_base_url() {
+        assert_eq!(
+            CoinWatchExternalClient::new("API_KEY".into())
+                .base_url,
+            "https://api.livecoinwatch.com".to_string()
+        );
+    }
+
+    #[test]
+    fn new_coinwatch_client_content_type() {
+        assert_eq!(
+            CoinWatchExternalClient::new("API_KEY".into())
+                .headers
+                .get("content-type")
+                .expect("Failed to unwrap")
+                .to_owned(),
+            "application/json".to_string()
+        );
+    }
+
+    #[test]
+    fn coinwatch_client_external_client_trait_base_url() {
+        assert_eq!(
+            CoinWatchExternalClient::new("API_KEY".into())
+                .get_base_url(),
+            "https://api.livecoinwatch.com".to_string()
+        );
+    }
+
+    #[test]
+    fn coinwatch_client_external_client_trait_key_header() {
+        assert_eq!(
+            CoinWatchExternalClient::new("API_KEY".into())
+                .get_headers()
+                .get("x-api-key")
+                .expect("Failed to unwrap")
+                .to_owned(),
+            "API_KEY".to_string()
+        );
+    }
+
+    #[test]
+    fn coinwatch_client_external_client_trait_content_header(
+    ) {
+        assert_eq!(
+            CoinWatchExternalClient::new("API_KEY".into())
+                .get_headers()
+                .get("content-type")
+                .expect("Failed to unwrap")
+                .to_owned(),
+            "application/json".to_string()
+        );
+    }
+
+    #[test]
+    fn default_impl_for_coinwatch_client() {
+        assert_eq!(
+            CoinWatchExternalClient::default()
+                .headers
+                .get("x-api-key")
+                .expect("Failed to unwrap")
+                .to_owned(),
+            "Default Key".to_string()
+        );
+    }
+
+    #[test]
+    fn bridge_error_from_networking_error() {
+        let network_error =
+            FFINetworkingError::RequestFailed {
+                status_code: Some(400),
+                url_session_underlying_error: None,
+                error_message_from_gateway: Some(
+                    "Bad Request".into(),
+                ),
+            };
+        assert_eq!(
+            FFIBridgeError::from(network_error.clone()),
+            FFIBridgeError::FromFFI {
+                error: FFISideError::Networking {
+                    error: network_error
+                }
+            }
+        );
     }
 }
