@@ -1,10 +1,9 @@
-use super::coin_watch_client::CoinWatchClient;
 use crate::state::AppState;
 use axum::{extract::State, http::StatusCode, Json};
-use crypto_service::coin_watch_service::models::{
+use crypto_service::coin_watch_service::{coin_watch_client::CoinWatchClient, models::{
     AggregatedCoinInformation, Coin, CoinHistoryRequest,
     CoinMeta, CoinMetaRequest, ListOfCoinsRequest,
-};
+}};
 
 pub async fn get_list_of_coins(
     State(state): State<AppState>,

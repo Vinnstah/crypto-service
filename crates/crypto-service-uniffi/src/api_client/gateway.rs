@@ -1,12 +1,8 @@
 use crate::{
-    api_client::network_antenna::{
-        ExternalClient, FFINetworkingRequest,
-        FFINetworkingResponse,
-    },
-    coin_watch_service::models::{
+    client_trait::Client, coin_watch_service::{coin_watch_client::CoinWatchClient, models::{
         CoinHistory, CoinHistoryRequest, CoinMeta,
         CoinMetaRequest, ListOfCoinsRequest,
-    },
+    }}, network_antenna::network_antenna::{FFINetworkingRequest, FFINetworkingResponse, NetworkAntenna}
 };
 use serde::{Deserialize, Serialize};
 use serde_json::to_vec;
@@ -15,9 +11,6 @@ use std::sync::Arc;
 use uniffi::{export, Object, Record};
 
 use super::error::{FFIBridgeError, RustSideError};
-use crate::api_client::network_antenna::{
-    CoinWatchExternalClient, NetworkAntenna,
-};
 
 #[derive(Object)]
 pub struct Gateway {
@@ -47,7 +40,7 @@ impl Gateway {
         &self,
         limit: u32,
     ) -> Result<Vec<CoinMeta>, FFIBridgeError> {
-        let external_client = CoinWatchExternalClient::new(
+        let external_client = CoinWatchClient::new_with_key(
             self.network_antenna.get_api_keys().coin_watch,
         );
         let request = ListOfCoinsRequest::new(limit);
@@ -65,7 +58,7 @@ impl Gateway {
         &self,
         request: CoinMetaRequest,
     ) -> Result<CoinMeta, FFIBridgeError> {
-        let external_client = CoinWatchExternalClient::new(
+        let external_client = CoinWatchClient::new_with_key(
             self.network_antenna.get_api_keys().coin_watch,
         );
 
@@ -82,7 +75,7 @@ impl Gateway {
         &self,
         request: CoinHistoryRequest,
     ) -> Result<CoinHistory, FFIBridgeError> {
-        let external_client = CoinWatchExternalClient::new(
+        let external_client = CoinWatchClient::new_with_key(
             self.network_antenna.get_api_keys().coin_watch,
         );
 
@@ -135,7 +128,7 @@ impl Gateway {
         U: for<'a> Deserialize<'a> + std::fmt::Debug,
         F: Fn(U) -> Result<V, E>,
         E: Into<FFIBridgeError>,
-        C: ExternalClient,
+        C: Client,
     {
         // JSON serialize request into body bytes
         let body = to_vec(&request).unwrap();
@@ -184,7 +177,7 @@ impl Gateway {
         U: for<'a> Deserialize<'a> + std::fmt::Debug,
         F: Fn(U) -> Result<V, E>,
         E: Into<FFIBridgeError>,
-        C: ExternalClient,
+        C: Client,
     {
         self.make_request::<_, U, V, _, _, _>(
             path, "POST", request, map, client,

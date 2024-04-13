@@ -52,8 +52,6 @@ extension URLSession: NetworkAntenna {
         
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
-            print(data)
-            print(response)
             return FfiNetworkingResponse(statusCode: 400, body: data)
         }
         

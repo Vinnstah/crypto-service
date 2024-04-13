@@ -1,6 +1,6 @@
 use core::fmt::Debug;
+use std::collections::HashMap;
 use crypto_service::client_trait::Client;
-use reqwest::header::{HeaderMap};
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct AlphaAdvantageClient {
@@ -24,8 +24,8 @@ impl Client for AlphaAdvantageClient {
         self.base_url.clone()
     }
 
-    fn get_headers(&self) -> HeaderMap {
-        HeaderMap::new()
+    fn get_headers(&self) -> HashMap<String, String> {
+        HashMap::new()
     }
 }
 

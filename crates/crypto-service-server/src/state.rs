@@ -1,7 +1,8 @@
+use crypto_service::coin_watch_service::coin_watch_client::CoinWatchClient;
+
 use crate::{
     alphavantage_api::alpha_client::AlphaAdvantageClient,
     api_client::api_client::ApiClient,
-    coin_watch::coin_watch_client::CoinWatchClient,
 };
 
 #[derive(Debug, Clone)]

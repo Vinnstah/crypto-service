@@ -3,13 +3,13 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use crypto_service::coin_watch_service::coin_watch_client::CoinWatchClient;
 use crypto_service_server::{
     alphavantage_api::{
         alpha_client::AlphaAdvantageClient, alpha_handler,
     },
     api_client::api_client::ApiClient,
     coin_watch::{
-        coin_watch_client::CoinWatchClient,
         coin_watch_handlers,
     },
     state::AppState,

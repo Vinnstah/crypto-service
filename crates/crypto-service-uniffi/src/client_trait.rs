@@ -1,26 +1,24 @@
 use core::fmt::Debug;
 use std::collections::HashMap;
-use reqwest::header::HeaderMap;
 
-pub trait Asset: Send {
-    
-}
+pub trait Asset: Send {}
 
 pub trait Client: Debug {
     fn get_base_url(&self) -> String;
-    fn get_headers(&self) -> HeaderMap;
+    fn get_headers(&self) -> HashMap<String, String>;
 }
 
 pub trait QueryItems {
     type Query;
-    fn get_all_queries(&self) -> HashMap<&str, Self::Query>;
+    fn get_all_queries(&self)
+        -> HashMap<&str, Self::Query>;
 }
 
 #[cfg(test)]
 #[derive(Debug)]
 struct TestClient {
     base_url: String,
-    headers: HeaderMap,
+    headers: HashMap<String, String>,
 }
 
 #[cfg(test)]
@@ -29,7 +27,7 @@ impl Client for TestClient {
         self.base_url.clone()
     }
 
-    fn get_headers(&self) -> HeaderMap {
+    fn get_headers(&self) -> HashMap<String, String> {
         self.headers.clone()
     }
 }
@@ -43,7 +41,7 @@ mod tests {
     fn get_base_url() {
         let test_client = TestClient {
             base_url: "http://www.apa.se".to_string(),
-            headers: HeaderMap::new(),
+            headers: HashMap::new(),
         };
         assert_eq!(
             test_client.get_base_url(),
@@ -53,16 +51,24 @@ mod tests {
 
     #[test]
     fn get_headers() {
-        let mut headers = HeaderMap::new();
-        headers.insert("apa", "banan".parse().unwrap());
+        let mut headers = HashMap::new();
+        headers.insert(
+            "apa".to_string(),
+            "banan".parse().unwrap(),
+        );
 
         let test_client = TestClient {
             base_url: String::new(),
             headers,
         };
 
-        assert!(test_client.get_headers().contains_key("apa"));
-        assert_eq!(test_client.get_headers().get("apa").unwrap(), "banan")
+        assert!(test_client
+            .get_headers()
+            .contains_key("apa"));
+        assert_eq!(
+            test_client.get_headers().get("apa").unwrap(),
+            "banan"
+        )
     }
 
     // #[test]

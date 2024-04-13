@@ -1,8 +1,10 @@
+
 use super::api_client::ApiClient;
 use axum::http::StatusCode;
 use crypto_service::client_trait::{Client, QueryItems};
 use reqwest::{Request, Response};
 use serde::{de::DeserializeOwned, Serialize};
+use crate::api_client::post::Headers;
 
 impl ApiClient {
     pub async fn get<T, U, C: Client>(
@@ -60,7 +62,7 @@ impl ApiClient {
 
         self.http_client
             .get(url)
-            .headers(client_source.get_headers())
+            .headers(Headers::from(client_source.get_headers()).0)
             .query(&query)
             .build()
             .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, axum::Json(e.to_string())))

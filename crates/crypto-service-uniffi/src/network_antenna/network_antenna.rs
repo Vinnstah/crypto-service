@@ -1,9 +1,9 @@
+use crate::api_client::error::{FFIBridgeError, FFINetworkingError};
 use crate::api_client::gateway::ClientKeys;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use uniffi::Record;
 
-use super::error::{FFIBridgeError, FFINetworkingError};
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CoinWatchExternalClient {
@@ -99,10 +99,9 @@ mod tests {
             FFIBridgeError, FFINetworkingError,
             FFISideError,
         },
-        network_antenna::{
-            CoinWatchExternalClient, ExternalClient,
-        },
     };
+    use crate::network_antenna::network_antenna::ExternalClient;
+    use crate::network_antenna::network_antenna::CoinWatchExternalClient;
 
     #[test]
     fn equality() {
