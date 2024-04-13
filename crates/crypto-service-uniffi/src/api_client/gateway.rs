@@ -196,3 +196,54 @@ impl Gateway {
 const fn res_id<T>(x: T) -> Result<T, FFIBridgeError> {
     identity::<Result<T, FFIBridgeError>>(Ok(x))
 }
+
+#[cfg(test)]
+mod tests {
+
+    use crate::api_client::error::FFINetworkingError;
+
+    use super::*;
+    struct TestAntenna {}
+
+    impl TestAntenna {
+        fn new() -> Self {
+            Self {}
+        }
+    }
+    impl NetworkAntenna for TestAntenna {
+        #[must_use]
+        #[allow(
+            clippy::type_complexity,
+            clippy::type_repetition_in_bounds
+        )]
+        fn make_request<'life0, 'async_trait>(
+            &'life0 self,
+            request: FFINetworkingRequest,
+        ) -> ::core::pin::Pin<
+            Box<
+                dyn ::core::future::Future<
+                        Output = Result<
+                            FFINetworkingResponse,
+                            FFINetworkingError,
+                        >,
+                    > + ::core::marker::Send
+                    + 'async_trait,
+            >,
+        >
+        where
+            'life0: 'async_trait,
+            Self: 'async_trait,
+        {
+            todo!()
+        }
+
+        fn get_api_keys(&self) -> ClientKeys {
+            todo!()
+        }
+    }
+    #[test]
+    fn new_gateway_client() {
+        let test_antenna = TestAntenna::new();
+        let gateway = Gateway::new(Arc::new(test_antenna));
+    }
+}

@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, uniffi::Record)]
+#[derive(Debug, Clone, Serialize, Deserialize, uniffi::Record, PartialEq)]
 pub struct TopAndBottomTrades {
     pub metadata: String,
     pub last_updated: String,
@@ -9,7 +9,7 @@ pub struct TopAndBottomTrades {
     pub most_actively_traded: Vec<MostActivelyTraded>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, uniffi::Record)]
+#[derive(Debug, Clone, Serialize, Deserialize, uniffi::Record, PartialEq)]
 pub struct MostActivelyTraded {
     pub ticker: String,
     pub price: String,

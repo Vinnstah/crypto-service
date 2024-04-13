@@ -1,6 +1,5 @@
 #![feature(trait_upcasting)]
 
-pub mod binance_service;
 pub mod alphavantage_service;
 pub mod client_trait;
 pub mod api_client;
