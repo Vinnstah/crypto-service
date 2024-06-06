@@ -63,7 +63,7 @@ impl From<HashMap<String, String>> for Headers {
     fn from(value: HashMap<String, String>) -> Self {
         let mut map: HeaderMap<HeaderValue> =
             HeaderMap::new();
-        value.iter().map(|(k, v)| {
+        let _ = value.iter().map(|(k, v)| {
             map.append(
                 HeaderName::from_str(k.as_str())
                     .expect("msg"),

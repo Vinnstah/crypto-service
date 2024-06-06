@@ -9,9 +9,7 @@ use crypto_service_server::{
         alpha_client::AlphaAdvantageClient, alpha_handler,
     },
     api_client::api_client::ApiClient,
-    coin_watch::{
-        coin_watch_handlers,
-    },
+    coin_watch::coin_watch_handlers,
     state::AppState,
 };
 
